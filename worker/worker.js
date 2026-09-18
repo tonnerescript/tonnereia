@@ -1,3 +1,4 @@
+import JSZip from "jszip";
 const AI_MODEL = "@cf/meta/llama-3.1-8b-instruct-fast";
 
 const SYSTEM_PROMPT = [
@@ -301,7 +302,73 @@ async function callAI(
       ? result.response
       : "";
 }
+async function downloadProject(request) {
+  let body;
 
+  try {
+    body = await request.json();
+  } catch (error) {
+    return json(
+      {
+        ok: false,
+        error: "JSON invalide."
+      },
+      400
+    );
+  }
+
+  const project = body.project || {};
+  const files = project.files || {};
+
+  if (!files["index.html"]) {
+    return json(
+      {
+        ok: false,
+        error: "Aucun projet valide à télécharger."
+      },
+      400
+    );
+  }
+
+  const zip = new JSZip();
+
+  for (const filename of Object.keys(files)) {
+    if (!files[filename]) continue;
+
+    zip.file(
+      filename,
+      files[filename]
+    );
+  }
+
+  const content = await zip.generateAsync({
+    type: "uint8array",
+    compression: "DEFLATE"
+  });
+
+  const projectName =
+    String(
+      project.projectName ||
+      "tonnerreia-site"
+    )
+      .toLowerCase()
+      .replace(/[^a-z0-9]+/g, "-")
+      .replace(/^-+|-+$/g, "")
+      .slice(0, 50) ||
+    "tonnerreia-site";
+
+  return new Response(content, {
+    status: 200,
+    headers: {
+      "content-type": "application/zip",
+      "content-disposition":
+        'attachment; filename="' +
+        projectName +
+        '.zip"',
+      "cache-control": "no-store"
+    }
+  });
+}
 async function generateSite(
   request,
   env
@@ -325,8 +392,15 @@ async function generateSite(
     String(
       body.prompt || ""
     ).trim();
-
-  if (!prompt) {
+if (
+  request.method === "POST" &&
+  url.pathname === "/api/download"
+) {
+  return downloadProject(request);
+}
+        request.method === "POST" &&
+      url.pathname === "/api/edit"      request.method === "POST" &&
+      url.pathname === "/api/edit"if (!prompt) {
     return json(
       {
         ok: false,
