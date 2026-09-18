@@ -2,6 +2,12 @@ export default {
   async fetch(request, env) {
     const url = new URL(request.url);
 
+    /*
+    ============================================================
+    PAGE PRINCIPALE
+    ============================================================
+    */
+
     if (request.method === "GET" && url.pathname === "/") {
       return new Response(HTML, {
         headers: {
@@ -10,34 +16,116 @@ export default {
       });
     }
 
-    if (request.method === "GET" && url.pathname === "/api/status") {
+    /*
+    ============================================================
+    STATUT
+    ============================================================
+    */
+
+    if (
+      request.method === "GET" &&
+      url.pathname === "/api/status"
+    ) {
       return Response.json({
         success: true,
         name: "TonnerreIA",
         cloudflare: true,
-        openai: false,
         workersAI: !!env.AI,
-        version: "project-generator-1"
+        storage: !!env.SITES,
+        version: "site-builder-1"
       });
     }
 
-    if (request.method === "POST" && url.pathname === "/api/chat") {
+    /*
+    ============================================================
+    CRÉATION D'UN SITE
+    ============================================================
+    */
+
+    if (
+      request.method === "POST" &&
+      url.pathname === "/api/generate"
+    ) {
       try {
         const body = await request.json();
 
-        if (!body.prompt || !body.prompt.trim()) {
+        const prompt = String(body.prompt || "").trim();
+
+        if (!prompt) {
           return Response.json(
-            { error: "Prompt manquant" },
+            {
+              success: false,
+              error: "Décris le site que tu veux créer."
+            },
             { status: 400 }
           );
         }
 
         if (!env.AI) {
           return Response.json(
-            { error: "Workers AI n'est pas connecté." },
+            {
+              success: false,
+              error:
+                "Workers AI n'est pas connecté au Worker."
+            },
             { status: 500 }
           );
         }
+
+        const systemPrompt = `
+Tu es TonnerreIA, un générateur professionnel de sites web.
+
+L'utilisateur va te demander de créer un site.
+
+Tu dois créer un VRAI site complet.
+
+Tu dois retourner UNIQUEMENT un objet JSON valide.
+
+Format obligatoire :
+
+{
+  "name": "nom-du-site",
+  "title": "Titre du site",
+  "description": "Description",
+  "files": [
+    {
+      "path": "index.html",
+      "content": "..."
+    },
+    {
+      "path": "style.css",
+      "content": "..."
+    },
+    {
+      "path": "script.js",
+      "content": "..."
+    }
+  ]
+}
+
+RÈGLES :
+
+1. Le fichier index.html doit être complet.
+2. Le fichier style.css doit être complet.
+3. Le fichier script.js doit être complet si JavaScript est nécessaire.
+4. Le site doit être responsive téléphone/tablette/ordinateur.
+5. Le design doit être moderne et professionnel.
+6. Ne mets PAS de Markdown.
+7. Ne mets PAS de triple backticks.
+8. Ne mets PAS de texte avant ou après le JSON.
+9. Les chemins doivent être relatifs.
+10. Le site doit fonctionner directement dans un navigateur.
+11. Si des images sont nécessaires, utilise des URLs d'images publiques ou des gradients/placeholders.
+12. Ne demande jamais à l'utilisateur d'installer quelque chose pour voir le site.
+13. Pour un restaurant, ajoute par exemple menu, présentation, horaires, contact et réservation si demandé.
+14. Pour un portfolio, ajoute les sections adaptées.
+15. Pour une boutique, ajoute produits, panier simple et sections adaptées.
+16. Pour un dashboard, crée une interface fonctionnelle côté navigateur.
+17. Tu peux créer plusieurs fichiers si nécessaire.
+18. Évite les fichiers inutilement énormes.
+
+Le résultat doit être directement utilisable comme vrai site internet.
+`;
 
         const result = await env.AI.run(
           "@cf/meta/llama-3.1-8b-instruct-fast",
@@ -45,680 +133,445 @@ export default {
             messages: [
               {
                 role: "system",
-                content: `Tu es TonnerreIA, une IA spécialisée dans la création de sites web, applications et scripts.
-
-Tu dois répondre en français.
-
-IMPORTANT :
-Quand l'utilisateur demande de créer un projet, réponds avec un projet COMPLET.
-
-Pour un site web, utilise cette structure :
-PROJECT_NAME
-FILE: index.html
-[code complet]
-END_FILE
-
-FILE: style.css
-[code complet]
-END_FILE
-
-FILE: script.js
-[code complet]
-END_FILE
-
-Ne donne jamais seulement un extrait.
-Chaque fichier doit être complet et directement utilisable.
-
-Pour un projet nécessitant plusieurs fichiers, crée tous les fichiers nécessaires.
-
-Tu peux créer :
-- sites HTML/CSS/JavaScript
-- dashboards
-- applications web
-- scripts JavaScript
-- bots Discord
-- interfaces
-- petits jeux web
-
-Si l'utilisateur demande simplement une question ou une explication, réponds normalement.`
+                content: systemPrompt
               },
               {
                 role: "user",
-                content: body.prompt
+                content: prompt
               }
             ]
           }
         );
 
-        const response =
+        let text =
           result?.response ||
           result?.result?.response ||
           result?.choices?.[0]?.message?.content ||
-          "Aucune réponse.";
+          "";
+
+        text = String(text).trim();
+
+        /*
+        Nettoyage si le modèle ajoute quand même des ```json
+        */
+
+        text = text
+          .replace(/^```json\s*/i, "")
+          .replace(/^```\s*/i, "")
+          .replace(/\s*```$/i, "")
+          .trim();
+
+        let project;
+
+        try {
+          project = JSON.parse(text);
+        } catch (error) {
+          /*
+          Tentative de récupération du premier objet JSON
+          */
+
+          const first = text.indexOf("{");
+          const last = text.lastIndexOf("}");
+
+          if (first !== -1 && last !== -1) {
+            const possibleJSON =
+              text.slice(first, last + 1);
+
+            project = JSON.parse(possibleJSON);
+          } else {
+            throw new Error(
+              "L'IA n'a pas retourné un projet JSON valide."
+            );
+          }
+        }
+
+        if (
+          !project ||
+          !Array.isArray(project.files)
+        ) {
+          throw new Error(
+            "Le projet généré ne contient pas de fichiers."
+          );
+        }
+
+        /*
+        Nettoyage des fichiers
+        */
+
+        project.files = project.files
+          .filter(
+            file =>
+              file &&
+              typeof file.path === "string" &&
+              typeof file.content === "string"
+          )
+          .map(file => ({
+            path: cleanPath(file.path),
+            content: file.content
+          }));
+
+        /*
+        Vérification index.html
+        */
+
+        if (
+          !project.files.some(
+            file => file.path === "index.html"
+          )
+        ) {
+          throw new Error(
+            "Le projet généré ne contient pas index.html."
+          );
+        }
+
+        /*
+        Nom du projet
+        */
+
+        project.name =
+          cleanSlug(
+            project.name ||
+            project.title ||
+            "mon-site"
+          );
+
+        project.title =
+          project.title ||
+          project.name;
+
+        project.description =
+          project.description ||
+          "";
 
         return Response.json({
           success: true,
-          response
+          project
         });
 
       } catch (error) {
         return Response.json(
           {
             success: false,
-            error: error?.message || "Erreur Workers AI"
+            error:
+              error?.message ||
+              "Erreur pendant la création du site."
           },
           { status: 500 }
         );
       }
     }
 
-    return new Response("TonnerreIA - Page introuvable", {
-      status: 404
-    });
+    /*
+    ============================================================
+    PUBLICATION D'UN SITE
+    ============================================================
+    */
+
+    if (
+      request.method === "POST" &&
+      url.pathname === "/api/publish"
+    ) {
+      try {
+        if (!env.SITES) {
+          return Response.json(
+            {
+              success: false,
+              error:
+                "Le stockage Cloudflare KV n'est pas encore connecté. Ajoute le binding SITES."
+            },
+            { status: 500 }
+          );
+        }
+
+        const body = await request.json();
+
+        const project = body.project;
+
+        if (
+          !project ||
+          !Array.isArray(project.files)
+        ) {
+          return Response.json(
+            {
+              success: false,
+              error: "Projet invalide."
+            },
+            { status: 400 }
+          );
+        }
+
+        const slug = createSlug(
+          project.name ||
+          project.title ||
+          "site"
+        );
+
+        const site = {
+          name: project.name || slug,
+          title: project.title || project.name || slug,
+          description:
+            project.description || "",
+          files: project.files,
+          createdAt: new Date().toISOString()
+        };
+
+        /*
+        Stockage du site dans Cloudflare KV
+        */
+
+        await env.SITES.put(
+          "site:" + slug,
+          JSON.stringify(site)
+        );
+
+        const publicUrl =
+          url.origin +
+          "/site/" +
+          encodeURIComponent(slug);
+
+        return Response.json({
+          success: true,
+          slug,
+          url: publicUrl
+        });
+
+      } catch (error) {
+        return Response.json(
+          {
+            success: false,
+            error:
+              error?.message ||
+              "Impossible de publier le site."
+          },
+          { status: 500 }
+        );
+      }
+    }
+
+    /*
+    ============================================================
+    AFFICHAGE D'UN SITE PUBLIÉ
+    ============================================================
+    */
+
+    if (
+      request.method === "GET" &&
+      url.pathname.startsWith("/site/")
+    ) {
+      try {
+        if (!env.SITES) {
+          return new Response(
+            "Stockage des sites non configuré.",
+            { status: 500 }
+          );
+        }
+
+        const slug =
+          decodeURIComponent(
+            url.pathname.substring("/site/".length)
+          );
+
+        if (!slug) {
+          return new Response(
+            "Site introuvable.",
+            { status: 404 }
+          );
+        }
+
+        const data =
+          await env.SITES.get(
+            "site:" + slug
+          );
+
+        if (!data) {
+          return new Response(
+            `
+            <!DOCTYPE html>
+            <html lang="fr">
+            <head>
+              <meta charset="UTF-8">
+              <title>Site introuvable</title>
+              <style>
+                body {
+                  margin:0;
+                  min-height:100vh;
+                  display:flex;
+                  align-items:center;
+                  justify-content:center;
+                  background:#080b12;
+                  color:white;
+                  font-family:Arial;
+                  text-align:center;
+                }
+              </style>
+            </head>
+            <body>
+              <div>
+                <h1>404</h1>
+                <p>Ce site n'existe pas.</p>
+              </div>
+            </body>
+            </html>
+            `,
+            {
+              status: 404,
+              headers: {
+                "Content-Type":
+                  "text/html; charset=UTF-8"
+              }
+            }
+          );
+        }
+
+        const site =
+          JSON.parse(data);
+
+        const html =
+          buildPreviewHTML(site.files);
+
+        return new Response(html, {
+          headers: {
+            "Content-Type":
+              "text/html; charset=UTF-8",
+            "Cache-Control":
+              "public, max-age=60"
+          }
+        });
+
+      } catch (error) {
+        return new Response(
+          "Erreur : " +
+            (error?.message || "Erreur inconnue"),
+          { status: 500 }
+        );
+      }
+    }
+
+    /*
+    ============================================================
+    404
+    ============================================================
+    */
+
+    return new Response(
+      "TonnerreIA - Page introuvable",
+      { status: 404 }
+    );
   }
 };
 
-const HTML = `<!DOCTYPE html>
-<html lang="fr">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>TonnerreIA - Créateur de projets</title>
+/*
+================================================================
+OUTILS
+================================================================
+*/
 
-<style>
-
-* {
-  box-sizing: border-box;
+function cleanPath(path) {
+  return String(path)
+    .replaceAll("\\", "/")
+    .replace(/^\/+/, "")
+    .replace(/\.\./g, "")
+    .trim();
 }
 
-body {
-  margin: 0;
-  font-family: Arial, sans-serif;
-  background: #080b12;
-  color: white;
+
+function cleanSlug(value) {
+  return String(value)
+    .toLowerCase()
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-+|-+$/g, "")
+    .slice(0, 50) || "mon-site";
 }
 
-header {
-  height: 70px;
-  display: flex;
-  align-items: center;
-  padding: 0 25px;
-  border-bottom: 1px solid #202633;
-  background: #0b0f18;
-}
 
-.logo {
-  font-size: 25px;
-  font-weight: bold;
-}
-
-.logo span {
-  margin-left: 5px;
-}
-
-.container {
-  max-width: 1200px;
-  margin: auto;
-  padding: 35px 20px;
-}
-
-.hero {
-  text-align: center;
-  margin-bottom: 35px;
-}
-
-.hero h1 {
-  font-size: 42px;
-  margin: 10px 0;
-}
-
-.hero p {
-  color: #9fa9bb;
-  font-size: 17px;
-}
-
-.examples {
-  display: flex;
-  gap: 10px;
-  justify-content: center;
-  flex-wrap: wrap;
-  margin-top: 20px;
-}
-
-.example {
-  background: #111722;
-  border: 1px solid #293244;
-  padding: 10px 15px;
-  border-radius: 10px;
-  cursor: pointer;
-}
-
-.example:hover {
-  border-color: white;
-}
-
-textarea {
-  width: 100%;
-  min-height: 150px;
-  padding: 18px;
-  background: #111722;
-  border: 1px solid #30394c;
-  border-radius: 14px;
-  color: white;
-  font-size: 16px;
-  resize: vertical;
-  outline: none;
-}
-
-.actions {
-  display: flex;
-  gap: 10px;
-  margin-top: 15px;
-}
-
-button {
-  border: 0;
-  border-radius: 10px;
-  padding: 13px 20px;
-  font-size: 15px;
-  font-weight: bold;
-  cursor: pointer;
-}
-
-.generate {
-  background: white;
-  color: #080b12;
-}
-
-.clear {
-  background: #202735;
-  color: white;
-}
-
-button:disabled {
-  opacity: .5;
-  cursor: not-allowed;
-}
-
-.workspace {
-  display: none;
-  margin-top: 30px;
-  border: 1px solid #293244;
-  border-radius: 14px;
-  overflow: hidden;
-  background: #0d121c;
-}
-
-.workspace.active {
-  display: block;
-}
-
-.tabs {
-  display: flex;
-  overflow-x: auto;
-  background: #111722;
-  border-bottom: 1px solid #293244;
-}
-
-.tab {
-  padding: 13px 18px;
-  cursor: pointer;
-  white-space: nowrap;
-  border-right: 1px solid #293244;
-}
-
-.tab.active {
-  background: #202735;
-}
-
-.file-content {
-  display: none;
-  padding: 20px;
-}
-
-.file-content.active {
-  display: block;
-}
-
-pre {
-  margin: 0;
-  white-space: pre-wrap;
-  word-break: break-word;
-  font-family: monospace;
-  line-height: 1.5;
-  color: #dce3ee;
-}
-
-.file-actions {
-  display: flex;
-  gap: 10px;
-  margin-bottom: 15px;
-}
-
-.preview {
-  display: none;
-  margin-top: 20px;
-}
-
-.preview.active {
-  display: block;
-}
-
-.preview iframe {
-  width: 100%;
-  height: 600px;
-  border: 1px solid #293244;
-  border-radius: 12px;
-  background: white;
-}
-
-.status {
-  margin-top: 15px;
-  color: #9fa9bb;
-  white-space: pre-wrap;
-}
-
-</style>
-</head>
-
-<body>
-
-<header>
-  <div class="logo">⚡ TonnerreIA</div>
-</header>
-
-<div class="container">
-
-  <div class="hero">
-
-    <h1>Crée ton projet avec l'IA</h1>
-
-    <p>
-      Décris ce que tu veux et TonnerreIA génère directement tes fichiers.
-    </p>
-
-    <div class="examples">
-
-      <div class="example"
-        onclick="setPrompt('Crée un site de restaurant moderne avec menu, réservation et contact')">
-        🍔 Restaurant
-      </div>
-
-      <div class="example"
-        onclick="setPrompt('Crée un site portfolio moderne pour un développeur')">
-        💻 Portfolio
-      </div>
-
-      <div class="example"
-        onclick="setPrompt('Crée un petit jeu web en HTML CSS JavaScript')">
-        🎮 Jeu
-      </div>
-
-      <div class="example"
-        onclick="setPrompt('Crée un dashboard administrateur moderne')">
-        📊 Dashboard
-      </div>
-
-    </div>
-
-  </div>
-
-  <textarea
-    id="prompt"
-    placeholder="Exemple : crée-moi un site de restaurant moderne avec menu, réservation, animations et formulaire de contact..."
-  ></textarea>
-
-  <div class="actions">
-
-    <button
-      class="generate"
-      id="generate"
-      onclick="generateProject()">
-      🚀 Créer le projet
-    </button>
-
-    <button
-      class="clear"
-      onclick="clearAll()">
-      Effacer
-    </button>
-
-  </div>
-
-  <div id="status" class="status">
-    TonnerreIA est prête.
-  </div>
-
-  <div id="workspace" class="workspace">
-
-    <div id="tabs" class="tabs"></div>
-
-    <div id="files"></div>
-
-    <div class="file-actions">
-
-      <button onclick="copyCurrent()">
-        📋 Copier
-      </button>
-
-      <button onclick="downloadCurrent()">
-        ⬇️ Télécharger
-      </button>
-
-      <button onclick="showPreview()">
-        👁️ Aperçu
-      </button>
-
-    </div>
-
-  </div>
-
-  <div id="preview" class="preview">
-
-    <h2>👁️ Aperçu</h2>
-
-    <iframe id="iframe"></iframe>
-
-  </div>
-
-</div>
-
-<script>
-
-let projectFiles = {};
-let currentFile = "";
-
-function setPrompt(text) {
-  document.getElementById("prompt").value = text;
-}
-
-function clearAll() {
-  document.getElementById("prompt").value = "";
-  document.getElementById("status").textContent =
-    "TonnerreIA est prête.";
-
-  document.getElementById("workspace")
-    .classList.remove("active");
-
-  document.getElementById("preview")
-    .classList.remove("active");
-
-  projectFiles = {};
-  currentFile = "";
-}
-
-async function generateProject() {
-
-  const prompt =
-    document.getElementById("prompt").value.trim();
-
-  const button =
-    document.getElementById("generate");
-
-  const status =
-    document.getElementById("status");
-
-  if (!prompt) {
-    status.textContent =
-      "❌ Décris ce que tu veux créer.";
-    return;
-  }
-
-  button.disabled = true;
-
-  status.textContent =
-    "⚡ TonnerreIA crée ton projet...";
-
-  document.getElementById("workspace")
-    .classList.remove("active");
-
-  try {
-
-    const response = await fetch("/api/chat", {
-
-      method: "POST",
-
-      headers: {
-        "Content-Type": "application/json"
-      },
-
-      body: JSON.stringify({
-        prompt
-      })
-
-    });
-
-    const data = await response.json();
-
-    if (!response.ok || !data.success) {
-      throw new Error(
-        data.error || "Erreur du serveur"
-      );
-    }
-
-    parseProject(data.response);
-
-    status.textContent =
-      "✅ Projet généré avec succès.";
-
-  } catch (error) {
-
-    status.textContent =
-      "❌ Erreur : " + error.message;
-
-  }
-
-  button.disabled = false;
-}
-
-function parseProject(text) {
-
-  projectFiles = {};
-
-  const regex =
-    /FILE:\\s*([^\\n]+)\\n([\\s\\S]*?)END_FILE/g;
-
-  let match;
-
-  while ((match = regex.exec(text)) !== null) {
-
-    const filename =
-      match[1].trim();
-
-    const content =
-      match[2].trim();
-
-    projectFiles[filename] = content;
-  }
-
-  if (Object.keys(projectFiles).length === 0) {
-
-    projectFiles["response.txt"] = text;
-  }
-
-  renderFiles();
-}
-
-function renderFiles() {
-
-  const tabs =
-    document.getElementById("tabs");
-
-  const files =
-    document.getElementById("files");
-
-  tabs.innerHTML = "";
-  files.innerHTML = "";
-
-  const names =
-    Object.keys(projectFiles);
-
-  currentFile = names[0];
-
-  names.forEach((name, index) => {
-
-    const tab =
-      document.createElement("div");
-
-    tab.className =
-      "tab" + (index === 0 ? " active" : "");
-
-    tab.textContent = "📄 " + name;
-
-    tab.onclick =
-      () => selectFile(name);
-
-    tabs.appendChild(tab);
-
-    const content =
-      document.createElement("div");
-
-    content.className =
-      "file-content" +
-      (index === 0 ? " active" : "");
-
-    content.id =
-      "file-" + encodeURIComponent(name);
-
-    const pre =
-      document.createElement("pre");
-
-    pre.textContent =
-      projectFiles[name];
-
-    content.appendChild(pre);
-
-    files.appendChild(content);
-
-  });
-
-  document.getElementById("workspace")
-    .classList.add("active");
-}
-
-function selectFile(name) {
-
-  currentFile = name;
-
-  document.querySelectorAll(".tab")
-    .forEach(tab => {
-
-      tab.classList.toggle(
-        "active",
-        tab.textContent === "📄 " + name
-      );
-
-    });
-
-  document.querySelectorAll(".file-content")
-    .forEach(content => {
-
-      content.classList.remove("active");
-
-    });
-
-  const selected =
-    document.getElementById(
-      "file-" + encodeURIComponent(name)
-    );
-
-  if (selected) {
-    selected.classList.add("active");
-  }
-}
-
-async function copyCurrent() {
-
-  if (!currentFile) return;
-
-  await navigator.clipboard.writeText(
-    projectFiles[currentFile]
+function createSlug(value) {
+  const base = cleanSlug(value);
+
+  return (
+    base +
+    "-" +
+    Math.random()
+      .toString(36)
+      .substring(2, 7)
   );
-
-  document.getElementById("status")
-    .textContent =
-    "✅ " + currentFile + " copié.";
 }
 
-function downloadCurrent() {
 
-  if (!currentFile) return;
+/*
+================================================================
+CONSTRUCTION DU SITE PUBLIÉ
+================================================================
+*/
 
-  const blob =
-    new Blob(
-      [projectFiles[currentFile]],
-      { type: "text/plain" }
+function buildPreviewHTML(files) {
+
+  const getFile = name => {
+    const file = files.find(
+      item => item.path === name
     );
 
-  const url =
-    URL.createObjectURL(blob);
-
-  const a =
-    document.createElement("a");
-
-  a.href = url;
-
-  a.download =
-    currentFile.split("/").pop();
-
-  a.click();
-
-  URL.revokeObjectURL(url);
-}
-
-function showPreview() {
-
-  if (!projectFiles["index.html"]) {
-
-    alert(
-      "Le projet ne contient pas de index.html."
-    );
-
-    return;
-  }
+    return file
+      ? file.content
+      : "";
+  };
 
   let html =
-    projectFiles["index.html"];
+    getFile("index.html");
 
-  if (projectFiles["style.css"]) {
+  const css =
+    getFile("style.css");
 
-    const css =
-      projectFiles["style.css"];
+  const js =
+    getFile("script.js");
 
-    html =
-      html.replace(
+  /*
+  Injection CSS
+  */
+
+  if (css) {
+    if (html.includes("</head>")) {
+      html = html.replace(
         "</head>",
-        "<style>" +
+        "<style>\n" +
         css +
-        "</style></head>"
+        "\n</style>\n</head>"
       );
+    } else {
+      html =
+        "<style>\n" +
+        css +
+        "\n</style>\n" +
+        html;
+    }
   }
 
-  if (projectFiles["script.js"]) {
+  /*
+  Injection JavaScript
+  */
 
-    const js =
-      projectFiles["script.js"];
-
-    html =
-      html.replace(
+  if (js) {
+    if (html.includes("</body>")) {
+      html = html.replace(
         "</body>",
-        "<script>" +
+        "<script>\n" +
         js +
-        "<\\/script></body>"
+        "\n</script>\n</body>"
       );
+    } else {
+      html +=
+        "<script>\n" +
+        js +
+        "\n</script>";
+    }
   }
 
-  const iframe =
-    document.getElementById("iframe");
+  /*
+  Empêche les chemins CSS/JS externes
+  d'être injectés deux fois.
+  */
 
-  iframe.srcdoc = html;
-
-  document.getElementById("preview")
-    .classList.add("active");
-}
-
-</script>
-
-</body>
-</html>`;
+  html = html.replace(
+    /<link[^>]+href=["']style
