@@ -1,22 +1,32 @@
 const AI_MODEL = "@cf/meta/llama-3.1-8b-instruct-fast";
 
 const SYSTEM_PROMPT = [
-  "Tu es TonnerreIA.",
-  "Tu crées des sites web complets.",
-  "Réponds uniquement avec les fichiers demandés.",
-  "Format obligatoire :",
-  "PROJECT_NAME: nom",
+  "Tu es TonnerreIA, un générateur professionnel de sites web.",
+  "À partir de la demande de l'utilisateur, crée un vrai site web complet, moderne et responsive.",
+  "",
+  "Le site doit contenir du HTML, du CSS et du JavaScript fonctionnel.",
+  "Les boutons, menus, formulaires, animations et interactions doivent fonctionner quand c'est possible.",
+  "Le design doit être professionnel et adapté au téléphone et à l'ordinateur.",
+  "",
+  "FORMAT OBLIGATOIRE :",
+  "PROJECT_NAME: nom du projet",
   "FILE: index.html",
-  "HTML",
+  "CONTENU HTML COMPLET",
   "END_FILE",
   "FILE: style.css",
-  "CSS",
+  "CONTENU CSS COMPLET",
   "END_FILE",
   "FILE: script.js",
-  "JAVASCRIPT",
+  "CONTENU JAVASCRIPT COMPLET",
   "END_FILE",
-  "Ne mets jamais de Markdown.",
-  "Ne mets jamais de ```."
+  "",
+  "IMPORTANT :",
+  "Ne mets pas de Markdown.",
+  "Ne mets pas de ```.",
+  "Ne mets pas d'explication avant ou après les fichiers.",
+  "Le fichier index.html doit être complet.",
+  "Le CSS doit être complet.",
+  "Le JavaScript doit être complet."
 ].join("\n");
 
 function json(data, status = 200) {
@@ -33,21 +43,28 @@ function page(body, status = 200) {
   return new Response(body, {
     status,
     headers: {
-      "content-type": "text/html; charset=UTF-8"
+      "content-type": "text/html; charset=UTF-8",
+      "cache-control": "no-store"
     }
   });
 }
 
-function parseProject(text) {
-  const source = String(text || "")
+function cleanSource(text) {
+  return String(text || "")
     .replace(/```html/gi, "")
     .replace(/```css/gi, "")
     .replace(/```javascript/gi, "")
     .replace(/```js/gi, "")
     .replace(/```/g, "")
     .trim();
+}
 
-  const nameMatch = source.match(/PROJECT_NAME:\s*(.+)/i);
+function parseProject(text) {
+  const source = cleanSource(text);
+
+  const nameMatch = source.match(
+    /PROJECT_NAME:\s*(.+)/i
+  );
 
   const projectName = nameMatch
     ? nameMatch[1].trim()
@@ -59,16 +76,20 @@ function parseProject(text) {
     "script.js": ""
   };
 
-  const regex = /FILE:\s*(index\.html|style\.css|script\.js)\s*\n([\s\S]*?)\s*END_FILE/gi;
+  const regex =
+    /FILE:\s*(index\.html|style\.css|script\.js)\s*\n([\s\S]*?)\s*END_FILE/gi;
 
   let match;
 
   while ((match = regex.exec(source)) !== null) {
-    files[match[1].toLowerCase()] = match[2].trim();
+    const filename = match[1].toLowerCase();
+    files[filename] = match[2].trim();
   }
 
   if (!files["index.html"]) {
-    const htmlMatch = source.match(/<!DOCTYPE html[\s\S]*<\/html>/i);
+    const htmlMatch = source.match(
+      /<!DOCTYPE html[\s\S]*<\/html>/i
+    );
 
     if (htmlMatch) {
       files["index.html"] = htmlMatch[0];
@@ -81,14 +102,97 @@ function parseProject(text) {
   };
 }
 
-const APP = `<!DOCTYPE html>
+function buildPreview(project) {
+  let html = project.files["index.html"] || "";
+  const css = project.files["style.css"] || "";
+  const js = project.files["script.js"] || "";
+
+  /*
+   * Si le HTML contient déjà une balise <html>,
+   * on injecte le CSS et le JS directement dedans.
+   */
+
+  if (/<html[\s\S]*<\/html>/i.test(html)) {
+
+    if (css) {
+      if (/<\/head>/i.test(html)) {
+        html = html.replace(
+          /<\/head>/i,
+          `<style>${css}</style></head>`
+        );
+      } else {
+        html =
+          `<style>${css}</style>\n` +
+          html;
+      }
+    }
+
+    if (js) {
+      if (/<\/body>/i.test(html)) {
+        html = html.replace(
+          /<\/body>/i,
+          `<script>${js}<\/script></body>`
+        );
+      } else {
+        html += `<script>${js}<\/script>`;
+      }
+    }
+
+    return html;
+  }
+
+  /*
+   * Si l'IA renvoie seulement le contenu du body,
+   * on crée automatiquement une vraie page HTML.
+   */
+
+  return `
+<!DOCTYPE html>
 <html lang="fr">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>${escapeHtml(project.projectName)}</title>
+<style>
+${css}
+</style>
+</head>
+<body>
+
+${html}
+
+<script>
+${js}
+<\/script>
+
+</body>
+</html>
+`;
+}
+
+function escapeHtml(value) {
+  return String(value || "")
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#039;");
+}
+
+const APP = `<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+
+<meta
+  name="viewport"
+  content="width=device-width, initial-scale=1.0"
+>
+
 <title>TonnerreIA</title>
 
 <style>
+
 * {
   box-sizing: border-box;
 }
@@ -96,9 +200,15 @@ const APP = `<!DOCTYPE html>
 body {
   margin: 0;
   min-height: 100vh;
-  font-family: Arial, sans-serif;
+  font-family: Arial, Helvetica, sans-serif;
   color: white;
-  background: #080914;
+  background:
+    radial-gradient(
+      circle at top,
+      #191634 0%,
+      #080914 45%,
+      #05060c 100%
+    );
 }
 
 .header {
@@ -106,282 +216,645 @@ body {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 0 25px;
-  border-bottom: 1px solid #202337;
-  background: #0c0e1c;
+  padding: 0 28px;
+  border-bottom: 1px solid #24263a;
+  background: rgba(9, 10, 20, .9);
+  backdrop-filter: blur(12px);
+  position: sticky;
+  top: 0;
+  z-index: 10;
 }
 
 .logo {
   font-size: 21px;
-  font-weight: bold;
+  font-weight: 800;
 }
 
 .logo span {
-  color: #7565ff;
+  color: #7868ff;
 }
 
 .online {
-  color: #65e59a;
   font-size: 13px;
+  color: #6de39a;
+}
+
+.main {
+  max-width: 1150px;
+  margin: auto;
+  padding: 65px 20px 80px;
 }
 
 .hero {
-  max-width: 900px;
-  margin: auto;
-  padding: 80px 20px 40px;
   text-align: center;
+  max-width: 850px;
+  margin: auto;
 }
 
 .badge {
   display: inline-block;
-  padding: 8px 14px;
-  border-radius: 30px;
-  background: #17152e;
-  color: #aaa1ff;
+  padding: 8px 15px;
+  border-radius: 999px;
+  border: 1px solid #36315e;
+  background: #15132a;
+  color: #aaa0ff;
   font-size: 13px;
 }
 
 h1 {
-  font-size: 60px;
-  margin: 22px 0 15px;
-  line-height: 1;
+  font-size: clamp(42px, 7vw, 72px);
+  line-height: .98;
+  letter-spacing: -3px;
+  margin: 22px 0;
+}
+
+.gradient {
+  background: linear-gradient(
+    90deg,
+    #8b78ff,
+    #4e9bff
+  );
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
 }
 
 .hero p {
-  color: #9da3b8;
+  color: #a5a9bc;
   font-size: 17px;
   line-height: 1.6;
+  max-width: 680px;
+  margin: auto;
 }
 
-.box {
-  max-width: 900px;
-  margin: 20px auto 80px;
-  padding: 15px;
+.generator {
+  margin-top: 45px;
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 15px;
+}
+
+.prompt-box {
+  padding: 8px;
+  border: 1px solid #292c42;
+  border-radius: 18px;
+  background: rgba(15, 17, 30, .9);
+  box-shadow: 0 20px 80px rgba(0,0,0,.3);
 }
 
 textarea {
   width: 100%;
-  height: 170px;
+  min-height: 170px;
   resize: vertical;
-  padding: 20px;
-  border-radius: 15px;
-  border: 1px solid #282c42;
+  border: 0;
   outline: none;
-  background: #101221;
+  padding: 20px;
+  border-radius: 13px;
+  background: transparent;
   color: white;
   font-size: 16px;
+  font-family: inherit;
 }
 
-textarea:focus {
-  border-color: #7165ff;
+textarea::placeholder {
+  color: #666b80;
 }
 
 .generate {
-  margin-top: 12px;
   width: 100%;
-  padding: 16px;
   border: 0;
   border-radius: 13px;
-  background: linear-gradient(135deg, #705cff, #358bff);
+  padding: 17px;
+  cursor: pointer;
   color: white;
   font-size: 16px;
-  font-weight: bold;
+  font-weight: 800;
+  background: linear-gradient(
+    135deg,
+    #735cff,
+    #388dff
+  );
+  transition:
+    transform .2s,
+    opacity .2s;
+}
+
+.generate:hover {
+  transform: translateY(-2px);
 }
 
 .generate:disabled {
   opacity: .5;
+  cursor: wait;
+  transform: none;
 }
 
 .message {
+  display: none;
   margin-top: 15px;
-  padding: 13px;
-  border-radius: 10px;
-  background: #101321;
-  color: #aeb5c9;
-  display: none;
+  padding: 14px 16px;
+  border-radius: 12px;
+  border: 1px solid #292c42;
+  background: #101221;
+  color: #aeb4c9;
+  text-align: left;
 }
 
-.result {
+.preview {
   display: none;
-  margin-top: 20px;
-  border: 1px solid #24283b;
-  border-radius: 15px;
+  margin-top: 35px;
+  border: 1px solid #292c42;
+  border-radius: 18px;
   overflow: hidden;
-  background: #0d0f1b;
+  background: #080910;
+  box-shadow: 0 30px 100px rgba(0,0,0,.4);
 }
 
-.result-head {
-  padding: 15px;
-  border-bottom: 1px solid #24283b;
-  font-weight: bold;
+.preview-header {
+  min-height: 58px;
+  padding: 12px 16px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 15px;
+  border-bottom: 1px solid #292c42;
+  background: #10121f;
 }
 
-pre {
-  margin: 0;
-  padding: 20px;
-  min-height: 300px;
-  max-height: 500px;
-  overflow: auto;
-  white-space: pre-wrap;
-  word-break: break-word;
-  color: #d7dbeb;
-  font-family: monospace;
+.preview-title {
+  font-weight: 800;
+}
+
+.preview-url {
+  color: #777d94;
   font-size: 12px;
 }
 
-@media (max-width: 600px) {
-  h1 {
-    font-size: 43px;
-  }
+.preview-screen {
+  background: white;
+  height: 650px;
+}
 
-  .hero {
-    padding-top: 55px;
-  }
+iframe {
+  width: 100%;
+  height: 100%;
+  border: 0;
+  display: block;
+  background: white;
+}
+
+.files {
+  display: none;
+  margin-top: 15px;
+  grid-template-columns:
+    repeat(3, 1fr);
+  gap: 10px;
+}
+
+.file {
+  padding: 13px;
+  border-radius: 10px;
+  border: 1px solid #292c42;
+  background: #10121f;
+  color: #b5bbce;
+  font-size: 13px;
+}
+
+@media (max-width: 700px) {
 
   .header {
     padding: 0 15px;
   }
+
+  .main {
+    padding-top: 45px;
+  }
+
+  h1 {
+    letter-spacing: -2px;
+  }
+
+  .preview-screen {
+    height: 600px;
+  }
+
+  .files {
+    grid-template-columns: 1fr;
+  }
+
+  .preview-header {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
 }
+
 </style>
 </head>
 
 <body>
 
 <header class="header">
-  <div class="logo">⚡ Tonnerre<span>IA</span></div>
-  <div class="online">● IA en ligne</div>
+
+  <div class="logo">
+    ⚡ Tonnerre<span>IA</span>
+  </div>
+
+  <div class="online">
+    ● IA en ligne
+  </div>
+
 </header>
+
+<main class="main">
 
 <section class="hero">
 
   <div class="badge">
-    ✦ Générateur de sites avec IA
+    ✦ Générateur de vrais sites web
   </div>
 
   <h1>
-    Crée ton site<br>
-    avec TonnerreIA
+    Crée ton site avec
+    <span class="gradient">
+      TonnerreIA
+    </span>
   </h1>
 
   <p>
-    Décris ton idée et TonnerreIA génère automatiquement
-    ton site web.
+    Décris simplement ton idée.
+    TonnerreIA génère le HTML, le CSS et le
+    JavaScript de ton site et l'affiche directement
+    dans un aperçu interactif.
   </p>
 
 </section>
 
-<section class="box">
+<section class="generator">
 
-  <textarea
-    id="prompt"
-    placeholder="Exemple : crée-moi un site moderne pour un restaurant italien avec un menu, les horaires, une réservation et un formulaire de contact..."
-  ></textarea>
+  <div class="prompt-box">
 
-  <button
-    class="generate"
-    id="generate"
-  >
-    ⚡ Générer mon site
-  </button>
+    <textarea
+      id="prompt"
+      placeholder="Exemple : crée-moi un site moderne pour un restaurant italien avec un menu, les horaires, une réservation, une galerie et un formulaire de contact..."
+    ></textarea>
+
+    <button
+      class="generate"
+      id="generate"
+    >
+      ⚡ Générer mon site
+    </button>
+
+  </div>
 
   <div
     class="message"
     id="message"
   ></div>
 
-  <div
-    class="result"
-    id="result"
-  >
-    <div class="result-head" id="projectName">
-      Site généré
+</section>
+
+<section
+  class="preview"
+  id="previewBox"
+>
+
+  <div class="preview-header">
+
+    <div>
+      <div
+        class="preview-title"
+        id="projectName"
+      >
+        ⚡ Site généré
+      </div>
+
+      <div class="preview-url">
+        Aperçu interactif
+      </div>
     </div>
 
-    <pre id="output"></pre>
+    <div>
+      ● LIVE PREVIEW
+    </div>
+
+  </div>
+
+  <div class="preview-screen">
+
+    <iframe
+      id="preview"
+      title="Aperçu du site généré"
+      sandbox="allow-scripts allow-forms"
+    ></iframe>
+
   </div>
 
 </section>
 
+<section
+  class="files"
+  id="files"
+>
+
+  <div class="file">
+    📄 index.html
+  </div>
+
+  <div class="file">
+    🎨 style.css
+  </div>
+
+  <div class="file">
+    ⚙️ script.js
+  </div>
+
+</section>
+
+</main>
+
 <script>
-const promptInput = document.getElementById("prompt");
-const generateButton = document.getElementById("generate");
-const message = document.getElementById("message");
-const result = document.getElementById("result");
-const output = document.getElementById("output");
-const projectName = document.getElementById("projectName");
+
+const promptInput =
+  document.getElementById("prompt");
+
+const generateButton =
+  document.getElementById("generate");
+
+const message =
+  document.getElementById("message");
+
+const previewBox =
+  document.getElementById("previewBox");
+
+const preview =
+  document.getElementById("preview");
+
+const projectName =
+  document.getElementById("projectName");
+
+const files =
+  document.getElementById("files");
 
 function showMessage(text) {
+
   message.style.display = "block";
   message.textContent = text;
+
 }
 
-generateButton.addEventListener("click", async function() {
+generateButton.addEventListener(
+  "click",
+  async function() {
 
-  const prompt = promptInput.value.trim();
+    const prompt =
+      promptInput.value.trim();
 
-  if (!prompt) {
-    showMessage("Écris d'abord ce que tu veux créer.");
-    return;
-  }
+    if (!prompt) {
 
-  generateButton.disabled = true;
-  generateButton.textContent = "⚡ Génération en cours...";
-  result.style.display = "none";
-
-  showMessage("TonnerreIA crée ton site...");
-
-  try {
-
-    const response = await fetch("/api/generate", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json"
-      },
-      body: JSON.stringify({
-        prompt: prompt
-      })
-    });
-
-    const data = await response.json();
-
-    if (!response.ok || !data.ok) {
-      throw new Error(
-        data.error || "Erreur pendant la génération."
+      showMessage(
+        "⚠️ Décris d'abord le site que tu veux créer."
       );
+
+      return;
+
     }
 
-    const project = data.project;
+    generateButton.disabled = true;
 
-    projectName.textContent =
-      "⚡ " +
-      (project.projectName || "Site généré");
+    generateButton.textContent =
+      "⚡ TonnerreIA construit le site...";
 
-    output.textContent =
-      project.files["index.html"] || "";
-
-    result.style.display = "block";
-
-    showMessage("✅ Ton site a été généré.");
-
-    result.scrollIntoView({
-      behavior: "smooth"
-    });
-
-  } catch (error) {
+    previewBox.style.display = "none";
+    files.style.display = "none";
 
     showMessage(
-      "❌ " +
-      (error.message || "Une erreur est survenue.")
+      "⏳ Génération du site en cours..."
     );
 
-  } finally {
+    try {
 
-    generateButton.disabled = false;
-    generateButton.textContent = "⚡ Générer mon site";
+      const response =
+        await fetch(
+          "/api/generate",
+          {
+            method: "POST",
+
+            headers: {
+              "Content-Type":
+                "application/json"
+            },
+
+            body: JSON.stringify({
+              prompt: prompt
+            })
+          }
+        );
+
+      let data;
+
+      try {
+        data = await response.json();
+      } catch (error) {
+
+        throw new Error(
+          "Le serveur a renvoyé une réponse invalide."
+        );
+
+      }
+
+      if (
+        !response.ok ||
+        !data.ok
+      ) {
+
+        throw new Error(
+          data.error ||
+          "Erreur pendant la génération."
+        );
+
+      }
+
+      const project =
+        data.project;
+
+      const html =
+        project.files["index.html"] || "";
+
+      const css =
+        project.files["style.css"] || "";
+
+      const js =
+        project.files["script.js"] || "";
+
+      projectName.textContent =
+        "⚡ " +
+        (
+          project.projectName ||
+          "Site généré"
+        );
+
+      /*
+       * On récupère le HTML complet.
+       */
+
+      let fullPage = html;
+
+      /*
+       * Si l'IA a fourni uniquement
+       * le contenu HTML sans document complet,
+       * on crée le document complet ici.
+       */
+
+      if (
+        !/<html[\\s\\S]*<\\/html>/i.test(
+          fullPage
+        )
+      ) {
+
+        fullPage = `
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+
+<meta charset="UTF-8">
+
+<meta
+  name="viewport"
+  content="width=device-width, initial-scale=1.0"
+>
+
+<style>
+${css}
+</style>
+
+</head>
+
+<body>
+
+${html}
+
+<script>
+${js}
+<\\/script>
+
+</body>
+
+</html>
+`;
+
+      } else {
+
+        /*
+         * Le HTML est déjà complet.
+         * On injecte le CSS.
+         */
+
+        if (css) {
+
+          if (
+            /<\\/head>/i.test(fullPage)
+          ) {
+
+            fullPage =
+              fullPage.replace(
+                /<\\/head>/i,
+                "<style>" +
+                css +
+                "</style></head>"
+              );
+
+          } else {
+
+            fullPage =
+              "<style>" +
+              css +
+              "</style>" +
+              fullPage;
+
+          }
+
+        }
+
+        /*
+         * Puis le JavaScript.
+         */
+
+        if (js) {
+
+          if (
+            /<\\/body>/i.test(fullPage)
+          ) {
+
+            fullPage =
+              fullPage.replace(
+                /<\\/body>/i,
+                "<script>" +
+                js +
+                "<\\/script></body>"
+              );
+
+          } else {
+
+            fullPage +=
+              "<script>" +
+              js +
+              "<\\/script>";
+
+          }
+
+        }
+
+      }
+
+      /*
+       * Affichage du vrai site dans l'iframe.
+       */
+
+      preview.srcdoc = fullPage;
+
+      previewBox.style.display =
+        "block";
+
+      files.style.display =
+        "grid";
+
+      showMessage(
+        "✅ Site généré ! Tu peux maintenant l'utiliser dans l'aperçu ci-dessous."
+      );
+
+      previewBox.scrollIntoView({
+        behavior: "smooth",
+        block: "start"
+      });
+
+    } catch (error) {
+
+      console.error(error);
+
+      showMessage(
+        "❌ " +
+        (
+          error.message ||
+          "Une erreur est survenue."
+        )
+      );
+
+    } finally {
+
+      generateButton.disabled =
+        false;
+
+      generateButton.textContent =
+        "⚡ Générer mon site";
+
+    }
 
   }
+);
 
-});
 </script>
 
 </body>
@@ -392,67 +865,110 @@ async function generate(request, env) {
   let body;
 
   try {
-    body = await request.json();
+
+    body =
+      await request.json();
+
   } catch (error) {
-    return json({
-      ok: false,
-      error: "JSON invalide."
-    }, 400);
+
+    return json(
+      {
+        ok: false,
+        error: "JSON invalide."
+      },
+      400
+    );
+
   }
 
-  const prompt = String(body.prompt || "").trim();
+  const prompt =
+    String(
+      body.prompt || ""
+    ).trim();
 
   if (!prompt) {
-    return json({
-      ok: false,
-      error: "Prompt vide."
-    }, 400);
+
+    return json(
+      {
+        ok: false,
+        error: "Prompt vide."
+      },
+      400
+    );
+
   }
 
   if (!env.AI) {
-    return json({
-      ok: false,
-      error: "Cloudflare AI n'est pas configuré."
-    }, 500);
+
+    return json(
+      {
+        ok: false,
+        error:
+          "Cloudflare Workers AI n'est pas configuré."
+      },
+      500
+    );
+
   }
 
   try {
 
-    const result = await env.AI.run(
-      AI_MODEL,
-      {
-        messages: [
-          {
-            role: "system",
-            content: SYSTEM_PROMPT
-          },
-          {
-            role: "user",
-            content: prompt
-          }
-        ],
-        max_tokens: 7000
-      }
-    );
+    const result =
+      await env.AI.run(
+        AI_MODEL,
+        {
+          messages: [
+            {
+              role: "system",
+              content:
+                SYSTEM_PROMPT
+            },
+            {
+              role: "user",
+              content:
+                prompt
+            }
+          ],
 
-    const text = result && result.response
-      ? result.response
-      : "";
+          max_tokens: 7000
+        }
+      );
+
+    const text =
+      result &&
+      result.response
+        ? result.response
+        : "";
 
     if (!text) {
-      return json({
-        ok: false,
-        error: "L'IA n'a renvoyé aucun résultat."
-      }, 500);
+
+      return json(
+        {
+          ok: false,
+          error:
+            "L'IA n'a renvoyé aucun résultat."
+        },
+        500
+      );
+
     }
 
-    const project = parseProject(text);
+    const project =
+      parseProject(text);
 
-    if (!project.files["index.html"]) {
-      return json({
-        ok: false,
-        error: "L'IA n'a pas correctement généré le HTML."
-      }, 500);
+    if (
+      !project.files["index.html"]
+    ) {
+
+      return json(
+        {
+          ok: false,
+          error:
+            "L'IA n'a pas correctement généré le HTML."
+        },
+        500
+      );
+
     }
 
     return json({
@@ -462,52 +978,75 @@ async function generate(request, env) {
 
   } catch (error) {
 
-    return json({
-      ok: false,
-      error: String(
-        error.message || error
-      )
-    }, 500);
+    return json(
+      {
+        ok: false,
+        error:
+          String(
+            error.message ||
+            error
+          )
+      },
+      500
+    );
 
   }
+
 }
 
 export default {
 
-  async fetch(request, env) {
+  async fetch(
+    request,
+    env
+  ) {
 
-    const url = new URL(request.url);
+    const url =
+      new URL(request.url);
 
     if (
       request.method === "GET" &&
       url.pathname === "/"
     ) {
+
       return page(APP);
+
     }
 
     if (
       request.method === "GET" &&
       url.pathname === "/api/status"
     ) {
+
       return json({
         ok: true,
         service: "TonnerreIA",
         cloudflare: true,
         workersAI: !!env.AI
       });
+
     }
 
     if (
       request.method === "POST" &&
       url.pathname === "/api/generate"
     ) {
-      return generate(request, env);
+
+      return generate(
+        request,
+        env
+      );
+
     }
 
-    return json({
-      ok: false,
-      error: "Route introuvable."
-    }, 404);
+    return json(
+      {
+        ok: false,
+        error: "Route introuvable."
+      },
+      404
+    );
+
   }
 
 };
