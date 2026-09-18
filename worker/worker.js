@@ -2,6 +2,8 @@ import JSZip from "jszip";
 
 const AI_MODEL = "@cf/meta/llama-3.1-8b-instruct-fast";
 
+const V4_PHOTOS_TONNERREIA = true;
+
 const SYSTEM_PROMPT = [
   "Tu es TonnerreIA, une IA experte en création de sites web.",
   "",
@@ -39,6 +41,22 @@ const SYSTEM_PROMPT = [
   "contact.html",
   "",
   "DESIGN:",
+  "V4 DESIGN PREMIUM:",
+  "- Le design doit avoir une identité visuelle forte et originale.",
+  "- Évite les templates génériques et les mises en page répétitives.",
+  "- Utilise une vraie hiérarchie visuelle avec un hero impressionnant.",
+  "- Utilise des espacements généreux et une grille professionnelle.",
+  "- Choisis une palette de couleurs adaptée au secteur.",
+  "- Choisis des typographies modernes et cohérentes.",
+  "- Utilise des boutons premium avec états hover et focus.",
+  "- Utilise des cartes élégantes avec profondeur et détails subtils.",
+  "- Ajoute des transitions et animations légères.",
+  "- Utilise des formes, gradients ou effets visuels seulement lorsqu'ils servent le design.",
+  "- Les sections doivent avoir des compositions visuelles variées.",
+  "- Le résultat doit ressembler à un vrai site réalisé par une agence web.",
+  "- Ne surcharge jamais la page.",
+  "- Respecte parfaitement le responsive mobile.",
+  "",
   "- Design professionnel.",
   "- Interface moderne.",
   "- Bonne hiérarchie visuelle.",
@@ -53,6 +71,12 @@ const SYSTEM_PROMPT = [
   "Exemples: menu mobile, FAQ, filtres, galerie, formulaire, animations, compteur.",
   "",
   "IMAGES:",
+  "Si des images utilisateur sont disponibles, elles sont représentées par des placeholders.",
+  "Utilise les placeholders exactement sous la forme TONNERRE_IMAGE_1, TONNERRE_IMAGE_2, TONNERRE_IMAGE_3, etc.",
+  "Place les images aux endroits les plus pertinents du site.",
+  "Ne modifie jamais le texte des placeholders.",
+  "Une image peut être utilisée plusieurs fois si cela améliore le design.",
+  "",
   "Tu peux utiliser des images distantes publiques si elles améliorent le résultat.",
   "",
   "FORMAT OBLIGATOIRE:",
@@ -327,6 +351,9 @@ async function generateSite(
   const prompt =
     String(body.prompt || "").trim();
 
+  const uploadedImages =
+    Array.isArray(body.images) ? body.images : [];
+
   if (!prompt) {
     return json(
       {
@@ -348,6 +375,19 @@ async function generateSite(
     );
   }
 
+  const imageInstructions = uploadedImages.length
+    ? [
+        "",
+        "IMAGES FOURNIES PAR L'UTILISATEUR:",
+        ...uploadedImages.map((image, index) =>
+          "TONNERRE_IMAGE_" + (index + 1) +
+          " = image utilisateur disponible"
+        ),
+        "",
+        "Utilise les placeholders TONNERRE_IMAGE_1, TONNERRE_IMAGE_2, etc. dans le HTML."
+      ]
+    : [];
+
   const userPrompt = [
     "Active le MODE CRÉATIF AUTOMATIQUE.",
     "",
@@ -359,7 +399,8 @@ async function generateSite(
     "Choisis automatiquement le nombre de pages.",
     "Crée un vrai site professionnel.",
     "index.html est obligatoire.",
-    "Utilise plusieurs pages uniquement si elles sont utiles."
+    "Utilise plusieurs pages uniquement si elles sont utiles.",
+    ...imageInstructions
   ].join("\n");
 
   try {
@@ -382,6 +423,31 @@ async function generateSite(
 
     const project =
       parseProject(responseText);
+
+    // Injection des photos utilisateur
+    if (uploadedImages.length) {
+      for (const filename of Object.keys(project.files)) {
+        let content = project.files[filename];
+
+        for (let i = 0; i < uploadedImages.length; i++) {
+          const image = uploadedImages[i];
+
+          if (
+            !image ||
+            typeof image !== "string"
+          ) continue;
+
+          const placeholder =
+            "TONNERRE_IMAGE_" + (i + 1);
+
+          content = content.split(
+            placeholder
+          ).join(image);
+        }
+
+        project.files[filename] = content;
+      }
+    }
 
     if (!project.files["index.html"]) {
       return json(
@@ -771,6 +837,61 @@ const APP = [
   "cursor:wait;",
   "}",
 
+  ".photosBox{",
+  "margin-top:18px;",
+  "padding:18px;",
+  "border:1px solid #292d44;",
+  "border-radius:18px;",
+  "background:#101221;",
+  "}",
+  ".photosTitle{",
+  "font-weight:800;",
+  "margin-bottom:6px;",
+  "}",
+  ".photosHint{",
+  "font-size:13px;",
+  "color:#858da4;",
+  "margin-bottom:12px;",
+  "}",
+  ".photosInput{",
+  "width:100%;",
+  "padding:12px;",
+  "border:1px dashed #454b69;",
+  "border-radius:12px;",
+  "background:#0b0d18;",
+  "color:#fff;",
+  "}",
+  ".photoList{",
+  "display:grid;",
+  "grid-template-columns:repeat(4,1fr);",
+  "gap:10px;",
+  "margin-top:12px;",
+  "}",
+  ".photoItem{",
+  "position:relative;",
+  "height:110px;",
+  "border-radius:12px;",
+  "overflow:hidden;",
+  "border:1px solid #34384f;",
+  "background:#080a12;",
+  "}",
+  ".photoItem img{",
+  "width:100%;",
+  "height:100%;",
+  "object-fit:cover;",
+  "}",
+  ".photoNumber{",
+  "position:absolute;",
+  "left:7px;",
+  "bottom:7px;",
+  "padding:4px 7px;",
+  "border-radius:7px;",
+  "background:rgba(0,0,0,.7);",
+  "font-size:11px;",
+  "}",
+  "@media(max-width:700px){",
+  ".photoList{grid-template-columns:repeat(2,1fr);}",
+  "}",
   "#message{",
   "display:none;",
   "margin-top:14px;",
