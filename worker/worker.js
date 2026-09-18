@@ -842,7 +842,7 @@ const APP = [
 
   '<div id="editBox">',
 
-  '<div class="editTitle">✏️ Modifier ton site avec l'IA</div>',
+ "<div class=\"editTitle\">✏️ Modifier ton site avec l'IA</div>",
 
   '<p class="editHint">',
   "Décris ce que tu veux changer. TonnerreIA conservera le reste du site.",
