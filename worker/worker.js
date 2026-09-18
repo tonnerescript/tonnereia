@@ -2586,7 +2586,15 @@ body {
         css +
         "</style>";
 
-      if (
+        request.method === "GET" &&
+        url.pathname === "/api/status"
+      ) {
+          {
+    ok: false,
+    error: "Route introuvable."
+  },
+  404
+);return json({      if (
         /<\/head>/i.test(page)
       ) {
 
@@ -2677,16 +2685,10 @@ body {
         request.method === "GET" &&
         url.pathname === "/api/status"
       ) {
-          {
-    ok: false,
-    error: "Route introuvable."
-  },
-  404
-);return json({
+        return json({
           ok: true,
           cloudflare: true,
-          workersAI:
-            Boolean(env.AI),
+          workersAI: Boolean(env.AI),
           model: AI_MODEL,
           version: "V7-PUBLISH"
         });
