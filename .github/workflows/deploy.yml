@@ -22,6 +22,17 @@ jobs:
       - name: Installer Wrangler
         run: npm install -g wrangler
 
+      - name: Vérifier les secrets
+        env:
+          CF_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CF_ACCOUNT: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          OPENAI_KEY: ${{ secrets.OPENAI_API_KEY }}
+        run: |
+          test -n "$CF_TOKEN" || (echo "❌ CLOUDFLARE_API_TOKEN absent" && exit 1)
+          test -n "$CF_ACCOUNT" || (echo "❌ CLOUDFLARE_ACCOUNT_ID absent" && exit 1)
+          test -n "$OPENAI_KEY" || (echo "❌ OPENAI_API_KEY absent" && exit 1)
+          echo "✅ Les 3 secrets GitHub sont présents."
+
       - name: Déployer TonnerreIA
         run: |
           wrangler deploy worker/worker.js \
@@ -30,3 +41,11 @@ jobs:
         env:
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+
+      - name: Envoyer la clé OpenAI à Cloudflare
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+        run: |
+          printf '%s' "$OPENAI_API_KEY" | wrangler secret put OPENAI_API_KEY --name tonnerreia
