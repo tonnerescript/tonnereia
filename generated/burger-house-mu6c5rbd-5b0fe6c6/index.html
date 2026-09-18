@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Burger House - Burgers généreux, produits frais et livraison rapide.">
+  <title>Burger House | Burgers généreux</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header class="site-header" id="accueil">
+    <nav class="navbar container">
+      <a class="logo" href="#accueil" aria-label="Burger House accueil">
+        <span class="logo-mark">BH</span>
+        <span>BURGER<br><strong>HOUSE</strong></span>
+      </a>
+      <button class="menu-toggle" aria-label="Ouvrir le menu" aria-expanded="false">☰</button>
+      <div class="nav-links">
+        <a href="#accueil">Accueil</a>
+        <a href="#menu">La carte</a>
+        <a href="#contact">Contact</a>
+        <button class="cart-button" id="open-cart" aria-label="Ouvrir le panier">
+          Panier <span class="cart-count">0</span>
+        </button>
+      </div>
+    </nav>
+
+    <div class="hero container">
+      <div class="hero-content">
+        <p class="eyebrow">LE BURGER QUI MET TOUT LE MONDE D'ACCORD</p>
+        <h1>Du caractère.<br><span>Du goût.</span></h1>
+        <p class="hero-text">Des burgers généreux préparés avec des produits frais, du pain brioché et beaucoup d'amour.</p>
+        <div class="hero-actions">
+          <a class="button button-primary" href="#menu">Découvrir la carte <span>→</span></a>
+          <a class="button button-light" href="#contact">Nous trouver</a>
+        </div>
+      </div>
+      <div class="hero-burger" aria-label="Burger servi avec des frites">
+        <div class="price-badge">À PARTIR DE<br><strong>9,90€</strong></div>
+        <div class="burger-illustration">
+          <div class="bun-top"></div>
+          <div class="lettuce"></div>
+          <div class="cheese"></div>
+          <div class="steak"></div>
+          <div class="tomato"></div>
+          <div class="bun-bottom"></div>
+        </div>
+        <div class="fries">🍟</div>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    <section class="benefits container">
+      <div class="benefit"><span>🥩</span><div><strong>100% frais</strong><small>Jamais surgelé</small></div></div>
+      <div class="benefit"><span>🍞</span><div><strong>Pain brioché</strong><small>Fait par notre boulanger</small></div></div>
+      <div class="benefit"><span>⚡</span><div><strong>Rapide & généreux</strong><small>Sur place ou à emporter</small></div></div>
+    </section>
+
+    <section class="menu-section" id="menu">
+      <div class="container">
+        <div class="section-heading">
+          <div><p class="eyebrow">NOTRE SÉLECTION</p><h2>La carte</h2></div>
+          <p>Des recettes simples, des ingrédients de qualité<br>et un max de plaisir à chaque bouchée.</p>
+        </div>
+        <div class="category-tabs" role="tablist">
+          <button class="category active" data-category="all">Tout</button>
+          <button class="category" data-category="burgers">Burgers</button>
+          <button class="category" data-category="accompagnements">Accompagnements</button>
+          <button class="category" data-category="boissons">Boissons</button>
+        </div>
+        <div class="products-grid" id="products-grid"></div>
+      </div>
+    </section>
+
+    <section class="about-section container">
+      <div class="about-image"><span>🍔</span></div>
+      <div class="about-content"><p class="eyebrow">NOTRE PHILOSOPHIE</p><h2>On ne plaisante pas<br>avec le <span>bon goût.</span></h2><p>Chez Burger House, on croit qu'un bon burger commence par de bons produits. Notre viande est française, nos sauces sont maison et nos légumes sont sélectionnés avec soin.</p><a href="#contact" class="text-link">En savoir plus <span>→</span></a></div>
+    </section>
+
+    <section class="contact-section" id="contact">
+      <div class="container contact-layout">
+        <div><p class="eyebrow">UNE QUESTION ?</p><h2>Parlons-nous.</h2><p class="contact-intro">Une envie, une suggestion ou une réservation de groupe ? Écrivez-nous, notre équipe vous répond rapidement.</p><div class="contact-details"><p>📍 14 rue des Gourmands, 75011 Paris</p><p>📞 01 42 42 42 42</p><p>✉️ bonjour@burgerhouse.fr</p></div></div>
+        <form class="contact-form" id="contact-form"><label for="name">Votre nom</label><input id="name" name="name" type="text" placeholder="Jean Dupont" required><label for="email">Votre adresse e-mail</label><input id="email" name="email" type="email" placeholder="jean@email.com" required><label for="message">Votre message</label><textarea id="message" name="message" rows="4" placeholder="Comment pouvons-nous vous aider ?" required></textarea><button class="button button-primary" type="submit">Envoyer le message <span>→</span></button><p class="form-message" id="form-message"></p></form>
+      </div>
+    </section>
+  </main>
+
+  <footer><div class="container footer-content"><a class="logo" href="#accueil"><span class="logo-mark">BH</span><span>BURGER<br><strong>HOUSE</strong></span></a><p>© 2024 Burger House. Fait avec amour et cheddar.</p><div class="socials"><a href="#contact">Instagram</a><a href="#contact">Facebook</a></div></div></footer>
+
+  <aside class="cart-panel" id="cart-panel" aria-label="Votre panier" aria-hidden="true"><div class="cart-header"><h2>Votre panier</h2><button id="close-cart" aria-label="Fermer le panier">×</button></div><div class="cart-items" id="cart-items"><p class="empty-cart">Votre panier est vide.<br>Ajoutez un burger pour commencer !</p></div><div class="cart-footer"><div class="total-row"><span>Total</span><strong id="cart-total">0,00 €</strong></div><button class="button button-primary checkout-button" id="checkout">Passer la commande</button></div></aside><div class="overlay" id="overlay"></div>
+  <script src="script.js"></script>
+</body>
+</html>

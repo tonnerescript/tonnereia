@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Burger House, des burgers gourmands préparés avec des ingrédients frais.">
+  <title>Burger House — Le goût qui rassemble</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header class="site-header">
+    <a class="logo" href="#accueil" aria-label="Burger House accueil"><span>BURGER</span><strong>HOUSE</strong></a>
+    <button class="menu-toggle" aria-label="Ouvrir le menu" aria-expanded="false">☰</button>
+    <nav class="main-nav" aria-label="Navigation principale">
+      <a href="#accueil">Accueil</a>
+      <a href="#menu">Notre menu</a>
+      <a href="#contact">Contact</a>
+      <button class="cart-button" id="open-cart" aria-label="Ouvrir le panier">Panier <span id="cart-count">0</span></button>
+    </nav>
+  </header>
+
+  <main>
+    <section class="hero" id="accueil">
+      <div class="hero-content">
+        <p class="eyebrow">Burgers artisanaux · Frites maison</p>
+        <h1>Le goût qui<br><span>rassemble.</span></h1>
+        <p class="hero-text">Des recettes généreuses, des produits frais et une bonne dose de passion. Bienvenue chez Burger House.</p>
+        <div class="hero-actions">
+          <a class="button button-primary" href="#menu">Découvrir le menu <span>→</span></a>
+          <a class="button button-light" href="#contact">Nous trouver</a>
+        </div>
+      </div>
+      <div class="hero-art" aria-label="Burger gourmand illustré">
+        <div class="burst">100%<br><small>gourmand</small></div>
+        <div class="burger-illustration">
+          <div class="bun-top"><i></i><i></i><i></i><i></i><i></i></div>
+          <div class="lettuce"></div>
+          <div class="cheese"></div>
+          <div class="patty"></div>
+          <div class="tomato"></div>
+          <div class="lettuce second"></div>
+          <div class="bun-bottom"></div>
+        </div>
+      </div>
+    </section>
+
+    <section class="features" aria-label="Nos engagements">
+      <div><span>✦</span><div><strong>Fait maison</strong><small>Chaque jour avec amour</small></div></div>
+      <div><span>♨</span><div><strong>Produits frais</strong><small>Sélectionnés avec soin</small></div></div>
+      <div><span>⚡</span><div><strong>Service rapide</strong><small>Sur place ou à emporter</small></div></div>
+    </section>
+
+    <section class="menu-section section" id="menu">
+      <div class="section-heading">
+        <div><p class="eyebrow">À la carte</p><h2>Nos incontournables</h2></div>
+        <p>Du classique réconfortant à la création la plus gourmande, il y en a pour tous les appétits.</p>
+      </div>
+      <div class="category-tabs" role="tablist">
+        <button class="active" data-category="all">Tout voir</button>
+        <button data-category="burgers">Burgers</button>
+        <button data-category="sides">Accompagnements</button>
+        <button data-category="drinks">Boissons</button>
+      </div>
+      <div class="products-grid" id="products-grid"></div>
+    </section>
+
+    <section class="promo section">
+      <div><p class="eyebrow">L'offre du moment</p><h2>Un burger acheté,<br><span>les frites offertes.</span></h2><p>Chaque mardi, sur place ou à emporter. Profitez-en vite !</p><a class="button button-dark" href="#menu">J'en profite <span>→</span></a></div>
+      <div class="promo-fries" aria-hidden="true">🍟</div>
+    </section>
+
+    <section class="contact section" id="contact">
+      <div class="contact-info"><p class="eyebrow">Une question ?</p><h2>On vous écoute.</h2><p>Une envie, une remarque ou simplement bonjour ? Écrivez-nous, notre équipe vous répond avec plaisir.</p><div class="info-line"><span>⌖</span><div><strong>12 rue du Faubourg</strong><small>75011 Paris</small></div></div><div class="info-line"><span>◷</span><div><strong>Ouvert 7j/7</strong><small>11h30 — 22h30</small></div></div><div class="info-line"><span>☎</span><div><strong>01 42 42 42 42</strong><small>Appelez-nous</small></div></div></div>
+      <form class="contact-form" id="contact-form"><label for="name">Votre nom</label><input id="name" name="name" type="text" placeholder="Jean Dupont" required><label for="email">Votre adresse email</label><input id="email" name="email" type="email" placeholder="jean@email.com" required><label for="message">Votre message</label><textarea id="message" name="message" rows="4" placeholder="Dites-nous tout..." required></textarea><button class="button button-primary" type="submit">Envoyer le message <span>→</span></button><p class="form-status" id="form-status" role="status"></p></form>
+    </section>
+  </main>
+
+  <footer><a class="logo" href="#accueil"><span>BURGER</span><strong>HOUSE</strong></a><p>© 2024 Burger House. Fait avec passion.</p><div class="socials"><a href="#contact" aria-label="Instagram">ig</a><a href="#contact" aria-label="Facebook">f</a><a href="#contact" aria-label="TikTok">♪</a></div></footer>
+
+  <aside class="cart-panel" id="cart-panel" aria-hidden="true"><div class="cart-header"><h2>Votre panier</h2><button id="close-cart" aria-label="Fermer le panier">×</button></div><div class="cart-items" id="cart-items"><p class="empty-cart">Votre panier est vide.<br><span>Ajoutez une petite merveille !</span></p></div><div class="cart-footer"><div><span>Sous-total</span><strong id="cart-total">0,00 €</strong></div><button class="button button-primary checkout-button" id="checkout">Commander <span>→</span></button></div></aside><div class="overlay" id="overlay"></div>
+  <script src="script.js"></script>
+</body>
+</html>

@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Burger House - Burgers généreux, produits frais et livraison rapide.">
+  <title>Burger House | Burgers généreux</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header class="site-header">
+    <nav class="navbar container" aria-label="Navigation principale">
+      <a class="logo" href="#accueil" aria-label="Burger House accueil"><span>BURGER</span><strong>HOUSE</strong></a>
+      <button class="menu-toggle" id="menuToggle" aria-label="Ouvrir le menu" aria-expanded="false"><span></span><span></span><span></span></button>
+      <div class="nav-links" id="navLinks">
+        <a href="#accueil">Accueil</a>
+        <a href="#menu">La carte</a>
+        <a href="#histoire">Notre histoire</a>
+        <a href="#contact">Contact</a>
+        <button class="cart-button" id="cartButton" aria-label="Ouvrir le panier">Panier <span id="cartCount">0</span></button>
+      </div>
+    </nav>
+  </header>
+
+  <main>
+    <section class="hero" id="accueil">
+      <div class="hero-content container">
+        <div class="hero-copy">
+          <p class="eyebrow">Le goût qui rassemble</p>
+          <h1>Le burger<br><em>comme on l'aime.</em></h1>
+          <p class="hero-text">Des recettes généreuses, du pain brioché toasté et des ingrédients soigneusement sélectionnés. Préparé avec passion, dévoré avec plaisir.</p>
+          <div class="hero-actions"><a class="button button-primary" href="#menu">Découvrir la carte <span>→</span></a><a class="button button-ghost" href="#histoire">Notre histoire</a></div>
+          <div class="hero-details"><span>★ <b>4.9/5</b> sur nos avis</span><span>⏱ Prêt en 15 min</span></div>
+        </div>
+        <div class="hero-visual"><div class="hero-circle"></div><img src="https://images.unsplash.com/photo-1568901346375-23c9450c58cd?auto=format&fit=crop&w=900&q=85" alt="Burger gourmand avec fromage fondu"><div class="floating-note"><strong>100%</strong><span>fait maison</span></div></div>
+      </div>
+    </section>
+
+    <section class="menu-section section" id="menu">
+      <div class="container">
+        <div class="section-heading"><div><p class="eyebrow">À la carte</p><h2>Nos incontournables</h2></div><p>Des burgers généreux et des accompagnements qui font toujours plaisir.</p></div>
+        <div class="filters" role="tablist" aria-label="Filtrer le menu"><button class="filter active" data-filter="all">Tout</button><button class="filter" data-filter="burger">Burgers</button><button class="filter" data-filter="accompagnement">Accompagnements</button><button class="filter" data-filter="dessert">Desserts</button></div>
+        <div class="products-grid" id="productsGrid"></div>
+      </div>
+    </section>
+
+    <section class="story-section section" id="histoire">
+      <div class="container story-grid"><div class="story-image"><img src="https://images.unsplash.com/photo-1552566626-52f8b828add9?auto=format&fit=crop&w=900&q=85" alt="Intérieur chaleureux du restaurant"></div><div class="story-copy"><p class="eyebrow">Notre histoire</p><h2>Du simple, du bon, du vrai.</h2><p>Chez Burger House, nous croyons qu'un bon burger commence par de bons produits. Chaque matin, nos pains sont livrés par notre boulanger partenaire et nos sauces sont préparées dans notre cuisine.</p><p>Pas de chichi, juste une cuisine généreuse, un accueil chaleureux et l'envie de vous faire passer un bon moment.</p><a class="text-link" href="#contact">Venez nous rencontrer <span>→</span></a></div></div>
+    </section>
+
+    <section class="contact-section section" id="contact">
+      <div class="container contact-grid"><div class="contact-intro"><p class="eyebrow">Une question ?</p><h2>Parlons-nous.</h2><p>Une réservation, une question ou simplement envie de nous dire bonjour ? Notre équipe vous répond avec plaisir.</p><div class="contact-info"><div><span class="info-icon">⌖</span><div><strong>Nous trouver</strong><p>24 rue des Gourmands<br>75011 Paris</p></div></div><div><span class="info-icon">◷</span><div><strong>Horaires</strong><p>Lun - Dim : 11h30 - 23h00</p></div></div><div><span class="info-icon">☎</span><div><strong>Nous appeler</strong><p>01 42 68 90 12</p></div></div></div></div><form class="contact-form" id="contactForm"><div class="form-row"><label>Nom<input type="text" name="name" placeholder="Votre nom" required></label><label>Email<input type="email" name="email" placeholder="vous@email.com" required></label></div><label>Sujet<select name="subject"><option>Question générale</option><option>Réservation</option><option>Commande</option><option>Événement privé</option></select></label><label>Message<textarea name="message" rows="5" placeholder="Votre message..." required></textarea></label><button class="button button-primary" type="submit">Envoyer le message <span>→</span></button><p class="form-status" id="formStatus" role="status"></p></form></div>
+    </section>
+  </main>
+
+  <footer class="footer"><div class="container footer-inner"><a class="logo" href="#accueil"><span>BURGER</span><strong>HOUSE</strong></a><p>Des burgers qui mettent tout le monde d'accord.</p><div class="socials"><a href="#contact" aria-label="Instagram">ig</a><a href="#contact" aria-label="Facebook">f</a><a href="#contact" aria-label="TikTok">♪</a></div></div><div class="container footer-bottom"><span>© 2024 Burger House. Tous droits réservés.</span><span>Fait avec ♥ et beaucoup de cheddar.</span></div></footer>
+
+  <aside class="cart-panel" id="cartPanel" aria-label="Votre panier" aria-hidden="true"><div class="cart-header"><div><p class="eyebrow">Votre sélection</p><h2>Mon panier</h2></div><button class="close-cart" id="closeCart" aria-label="Fermer le panier">×</button></div><div class="cart-items" id="cartItems"><div class="empty-cart"><span>🍔</span><p>Votre panier est vide.</p><small>Ajoutez un burger pour commencer !</small></div></div><div class="cart-footer"><div class="cart-total"><span>Total</span><strong id="cartTotal">0,00 €</strong></div><button class="button button-primary checkout-button" id="checkoutButton">Commander <span>→</span></button><small>Paiement à la livraison ou sur place</small></div></aside><div class="overlay" id="overlay"></div>
+  <script src="script.js"></script>
+</body>
+</html>

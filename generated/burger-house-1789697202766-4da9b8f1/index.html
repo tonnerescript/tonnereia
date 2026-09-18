@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang='fr'>
+<head>
+  <meta charset='UTF-8'>
+  <meta name='viewport' content='width=device-width, initial-scale=1.0'>
+  <meta name='description' content='Burger House, le restaurant de burgers gourmands préparés avec des produits frais.'>
+  <title>Burger House — Burgers généreux</title>
+  <link rel='preconnect' href='https://fonts.googleapis.com'>
+  <link rel='preconnect' href='https://fonts.gstatic.com' crossorigin>
+  <link href='https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@400;500;600;700;800&display=swap' rel='stylesheet'>
+  <link rel='stylesheet' href='style.css'>
+</head>
+<body>
+  <header class='site-header'>
+    <a class='logo' href='#accueil' aria-label='Burger House accueil'><span>BURGER</span><b>HOUSE</b></a>
+    <nav class='main-nav' id='mainNav'>
+      <a href='#accueil'>Accueil</a>
+      <a href='#menu'>Notre menu</a>
+      <a href='#experience'>Notre histoire</a>
+      <a href='#contact'>Contact</a>
+    </nav>
+    <button class='cart-button' id='openCart' aria-label='Ouvrir le panier'>Panier <span id='cartCount'>0</span></button>
+    <button class='menu-toggle' id='menuToggle' aria-label='Ouvrir le menu'>☰</button>
+  </header>
+
+  <main>
+    <section class='hero' id='accueil'>
+      <div class='hero-content'>
+        <p class='eyebrow'>SMASHED WITH LOVE</p>
+        <h1>Le burger<br><em>qui met tout le monde d'accord.</em></h1>
+        <p class='hero-text'>Des recettes généreuses, des ingrédients frais et une bonne dose de gourmandise. Bienvenue chez Burger House.</p>
+        <div class='hero-actions'>
+          <a href='#menu' class='button button-primary'>Découvrir le menu <span>↗</span></a>
+          <a href='#experience' class='text-link'>Notre histoire <span>→</span></a>
+        </div>
+      </div>
+      <div class='hero-badge'><strong>100%</strong><span>FAIT<br>MAISON</span></div>
+      <div class='scroll-hint'>↓ <span>FAITES DÉFILER</span></div>
+    </section>
+
+    <section class='quick-info'>
+      <div><span class='info-icon'>⌖</span><p><strong>12 rue du Faubourg</strong><small>75010 Paris</small></p></div>
+      <div><span class='info-icon'>◷</span><p><strong>Ouvert aujourd'hui</strong><small>11h30 — 23h00</small></p></div>
+      <div><span class='info-icon'>♨</span><p><strong>Livraison & click & collect</strong><small>Commandez en ligne</small></p></div>
+    </section>
+
+    <section class='menu-section section' id='menu'>
+      <div class='section-heading'>
+        <div><p class='eyebrow'>À LA CARTE</p><h2>Nos burgers<br><em>signature.</em></h2></div>
+        <p class='section-intro'>Chaque burger est préparé à la minute avec un pain brioché toasté, une viande française et des sauces maison.</p>
+      </div>
+      <div class='category-tabs'>
+        <button class='category active' data-category='all'>Tout</button>
+        <button class='category' data-category='classic'>Les classiques</button>
+        <button class='category' data-category='veggie'>Végétarien</button>
+        <button class='category' data-category='side'>Accompagnements</button>
+      </div>
+      <div class='product-grid' id='productGrid'></div>
+    </section>
+
+    <section class='experience section' id='experience'>
+      <div class='experience-image'></div>
+      <div class='experience-content'><p class='eyebrow'>L'ESPRIT BURGER HOUSE</p><h2>Simplement<br><em>bon.</em></h2><p>Chez nous, pas de chichi. On sélectionne les meilleurs produits, on les cuisine avec passion et on vous accueille comme à la maison. Notre secret ? Ne jamais faire de compromis sur le goût.</p><a href='#contact' class='button button-dark'>Nous rendre visite <span>↗</span></a></div>
+    </section>
+
+    <section class='contact section' id='contact'>
+      <div class='contact-copy'><p class='eyebrow'>UNE QUESTION ?</p><h2>Parlons-nous.</h2><p>Une réservation, une question ou simplement envie de nous dire bonjour ? Écrivez-nous, on vous répond rapidement.</p><div class='contact-details'><p><strong>hello@burgerhouse.fr</strong><br>01 42 00 20 20</p><p>12 rue du Faubourg<br>75010 Paris</p></div></div>
+      <form class='contact-form' id='contactForm'><label for='name'>Votre nom</label><input id='name' name='name' type='text' placeholder='Jean Dupont' required><label for='email'>Votre adresse e-mail</label><input id='email' name='email' type='email' placeholder='jean@email.com' required><label for='message'>Votre message</label><textarea id='message' name='message' rows='4' placeholder='Comment pouvons-nous vous aider ?' required></textarea><button class='button button-primary' type='submit'>Envoyer le message <span>→</span></button><p class='form-message' id='formMessage'></p></form>
+    </section>
+  </main>
+
+  <footer class='footer'><a class='logo' href='#accueil'><span>BURGER</span><b>HOUSE</b></a><p>© 2024 Burger House. Fait avec amour et beaucoup de cheddar.</p><div class='socials'><a href='#' aria-label='Instagram'>ig</a><a href='#' aria-label='Facebook'>fb</a><a href='#' aria-label='TikTok'>tk</a></div></footer>
+
+  <aside class='cart-panel' id='cartPanel' aria-label='Votre panier'><div class='cart-header'><h2>Votre panier</h2><button id='closeCart' aria-label='Fermer le panier'>×</button></div><div class='cart-items' id='cartItems'><p class='empty-cart'>Votre panier est vide.<br><span>Ajoutez un burger pour commencer.</span></p></div><div class='cart-footer'><div class='total-line'><span>Total</span><strong id='cartTotal'>0,00 €</strong></div><button class='button button-primary checkout-button' id='checkoutButton'>Commander <span>→</span></button></div></aside><div class='overlay' id='overlay'></div>
+  <div class='toast' id='toast'>Produit ajouté au panier ✓</div>
+  <script src='script.js'></script>
+</body>
+</html>

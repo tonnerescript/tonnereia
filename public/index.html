@@ -1,0 +1,544 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+
+<meta charset="UTF-8">
+
+<meta
+    name="viewport"
+    content="width=device-width, initial-scale=1.0"
+>
+
+<title>TonnerreIA</title>
+
+<style>
+
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    font-family: Arial, sans-serif;
+    background: #09090d;
+    color: white;
+    min-height: 100vh;
+}
+
+header {
+    height: 70px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 25px;
+    background: #111116;
+    border-bottom: 1px solid #292933;
+}
+
+.logo {
+    font-size: 23px;
+    font-weight: bold;
+}
+
+.logo span {
+    color: #8b5cf6;
+}
+
+.status {
+    color: #4ade80;
+    font-size: 13px;
+}
+
+main {
+    width: 94%;
+    max-width: 1100px;
+    margin: 40px auto;
+}
+
+.hero {
+    text-align: center;
+    margin-bottom: 35px;
+}
+
+.hero h1 {
+    font-size: 44px;
+    margin-bottom: 10px;
+}
+
+.hero h1 span {
+    color: #8b5cf6;
+}
+
+.hero p {
+    color: #999;
+    font-size: 16px;
+}
+
+.card {
+    background: #111116;
+    border: 1px solid #292933;
+    border-radius: 18px;
+    padding: 22px;
+    margin-bottom: 25px;
+}
+
+label {
+    display: block;
+    margin-bottom: 12px;
+    font-weight: bold;
+}
+
+textarea {
+    width: 100%;
+    min-height: 170px;
+    resize: vertical;
+    background: #08080c;
+    color: white;
+    border: 1px solid #30303a;
+    border-radius: 12px;
+    padding: 15px;
+    font-size: 15px;
+    outline: none;
+}
+
+textarea:focus {
+    border-color: #8b5cf6;
+}
+
+.buttons {
+    display: flex;
+    gap: 10px;
+    margin-top: 15px;
+    flex-wrap: wrap;
+}
+
+button {
+    border: 0;
+    border-radius: 10px;
+    padding: 12px 18px;
+    font-size: 14px;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+#generate {
+    background: #8b5cf6;
+    color: white;
+    flex: 1;
+}
+
+.secondary {
+    background: #292933;
+    color: white;
+}
+
+button:disabled {
+    opacity: 0.6;
+    cursor: wait;
+}
+
+.project-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 15px;
+    flex-wrap: wrap;
+    margin-bottom: 20px;
+}
+
+.project-name {
+    font-size: 21px;
+    font-weight: bold;
+}
+
+.project-description {
+    color: #999;
+    margin-top: 6px;
+}
+
+.file-list {
+    display: grid;
+    gap: 8px;
+}
+
+.file {
+    background: #08080c;
+    border: 1px solid #292933;
+    border-radius: 10px;
+    padding: 13px 15px;
+    font-family: monospace;
+    color: #d7d7e0;
+}
+
+.download {
+    display: none;
+    background: #22c55e;
+    color: white;
+    text-decoration: none;
+    border-radius: 10px;
+    padding: 12px 18px;
+    font-weight: bold;
+}
+
+#error {
+    display: none;
+    margin-top: 12px;
+    color: #f87171;
+}
+
+#loading {
+    display: none;
+    color: #a78bfa;
+    margin-top: 15px;
+}
+
+footer {
+    text-align: center;
+    color: #666;
+    padding: 30px;
+    font-size: 13px;
+}
+
+@media(max-width: 600px) {
+
+    .hero h1 {
+        font-size: 34px;
+    }
+
+    main {
+        margin-top: 25px;
+    }
+
+    #generate {
+        flex: 100%;
+    }
+
+}
+
+</style>
+
+</head>
+
+
+<body>
+
+
+<header>
+
+    <div class="logo">
+        ⚡ Tonnerre<span>IA</span>
+    </div>
+
+    <div class="status">
+        ● En ligne
+    </div>
+
+</header>
+
+
+<main>
+
+
+<section class="hero">
+
+    <h1>
+        Tonnerre<span>IA</span>
+    </h1>
+
+    <p>
+        Décris ton idée. TonnerreIA crée le projet complet.
+    </p>
+
+</section>
+
+
+<section class="card">
+
+    <label for="prompt">
+        🤖 Que veux-tu créer ?
+    </label>
+
+    <textarea
+        id="prompt"
+        placeholder="Exemple : crée-moi un site internet pour un restaurant de burgers avec accueil, menu, panier et formulaire de contact..."
+    ></textarea>
+
+
+    <div class="buttons">
+
+        <button id="generate">
+            ⚡ Créer le projet
+        </button>
+
+        <button
+            class="secondary"
+            id="clear"
+        >
+            🗑️ Effacer
+        </button>
+
+    </div>
+
+
+    <div id="loading">
+        ⏳ TonnerreIA construit ton projet...
+    </div>
+
+
+    <div id="error"></div>
+
+</section>
+
+
+
+<section
+    class="card"
+    id="resultCard"
+    style="display:none;"
+>
+
+
+    <div class="project-header">
+
+        <div>
+
+            <div
+                class="project-name"
+                id="projectName"
+            ></div>
+
+            <div
+                class="project-description"
+                id="projectDescription"
+            ></div>
+
+        </div>
+
+
+        <a
+            id="download"
+            class="download"
+            href="#"
+        >
+            📦 Télécharger le ZIP
+        </a>
+
+    </div>
+
+
+    <h3 style="margin-bottom:12px;">
+        📁 Fichiers créés
+    </h3>
+
+
+    <div
+        class="file-list"
+        id="fileList"
+    ></div>
+
+
+</section>
+
+
+</main>
+
+
+<footer>
+
+    ⚡ TonnerreIA — Créateur de projets IA
+
+</footer>
+
+
+
+<script>
+
+const promptInput =
+    document.getElementById("prompt");
+
+const generateButton =
+    document.getElementById("generate");
+
+const clearButton =
+    document.getElementById("clear");
+
+const loading =
+    document.getElementById("loading");
+
+const errorBox =
+    document.getElementById("error");
+
+const resultCard =
+    document.getElementById("resultCard");
+
+const projectName =
+    document.getElementById("projectName");
+
+const projectDescription =
+    document.getElementById("projectDescription");
+
+const fileList =
+    document.getElementById("fileList");
+
+const download =
+    document.getElementById("download");
+
+
+
+generateButton.addEventListener(
+    "click",
+    async () => {
+
+        const prompt =
+            promptInput.value.trim();
+
+
+        errorBox.style.display = "none";
+
+
+        if (!prompt) {
+
+            errorBox.textContent =
+                "⚠️ Décris le projet que tu veux créer.";
+
+            errorBox.style.display =
+                "block";
+
+            return;
+        }
+
+
+        generateButton.disabled = true;
+
+        generateButton.textContent =
+            "⏳ Création...";
+
+        loading.style.display =
+            "block";
+
+        resultCard.style.display =
+            "none";
+
+
+        try {
+
+            const response =
+                await fetch(
+                    "/api/generate-project",
+                    {
+                        method: "POST",
+
+                        headers: {
+                            "Content-Type":
+                                "application/json"
+                        },
+
+                        body: JSON.stringify({
+                            prompt: prompt
+                        })
+                    }
+                );
+
+
+            const data =
+                await response.json();
+
+
+            if (!response.ok) {
+
+                throw new Error(
+                    data.error ||
+                    "Erreur du serveur."
+                );
+
+            }
+
+
+            projectName.textContent =
+                "📦 " +
+                data.projectName;
+
+
+            projectDescription.textContent =
+                data.description || "";
+
+
+            fileList.innerHTML = "";
+
+
+            for (const file of data.files) {
+
+                const div =
+                    document.createElement("div");
+
+                div.className =
+                    "file";
+
+                div.textContent =
+                    "📄 " + file.path;
+
+                fileList.appendChild(div);
+
+            }
+
+
+            download.href =
+                data.zipUrl;
+
+            download.style.display =
+                "inline-block";
+
+
+            resultCard.style.display =
+                "block";
+
+
+        } catch (error) {
+
+            errorBox.textContent =
+                "❌ " + error.message;
+
+            errorBox.style.display =
+                "block";
+
+        }
+
+
+        generateButton.disabled = false;
+
+        generateButton.textContent =
+            "⚡ Créer le projet";
+
+        loading.style.display =
+            "none";
+
+    }
+);
+
+
+
+clearButton.addEventListener(
+    "click",
+    () => {
+
+        promptInput.value = "";
+
+        errorBox.style.display =
+            "none";
+
+        resultCard.style.display =
+            "none";
+
+        fileList.innerHTML = "";
+
+    }
+);
+
+</script>
+
+
+</body>
+
+</html>

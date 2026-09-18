@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang='fr'>
+<head>
+  <meta charset='UTF-8'>
+  <meta name='viewport' content='width=device-width, initial-scale=1.0'>
+  <meta name='description' content='Burger House, les meilleurs burgers artisanaux préparés avec passion.'>
+  <title>Burger House — Burgers artisanaux</title>
+  <link rel='preconnect' href='https://fonts.googleapis.com'>
+  <link rel='preconnect' href='https://fonts.gstatic.com' crossorigin>
+  <link href='https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap' rel='stylesheet'>
+  <link rel='stylesheet' href='style.css'>
+</head>
+<body>
+  <header class='site-header'>
+    <div class='container nav-wrap'>
+      <a class='logo' href='#accueil' aria-label='Burger House accueil'>
+        <span class='logo-mark'>BH</span>
+        <span>Burger<span>House</span></span>
+      </a>
+      <nav class='main-nav' id='mainNav'>
+        <a href='#accueil'>Accueil</a>
+        <a href='#menu'>Notre menu</a>
+        <a href='#histoire'>Notre histoire</a>
+        <a href='#contact'>Contact</a>
+      </nav>
+      <button class='cart-button' id='openCart' aria-label='Ouvrir le panier'>
+        <span class='cart-icon'>🛒</span>
+        <span>Panier</span>
+        <b id='cartCount'>0</b>
+      </button>
+      <button class='menu-toggle' id='menuToggle' aria-label='Ouvrir le menu'>☰</button>
+    </div>
+  </header>
+
+  <main>
+    <section class='hero' id='accueil'>
+      <div class='container hero-grid'>
+        <div class='hero-copy'>
+          <p class='eyebrow'>🔥 Le goût qui met tout le monde d'accord</p>
+          <h1>Le burger qui<br><em>fait la différence.</em></h1>
+          <p class='hero-text'>Des recettes généreuses, des ingrédients frais et une bonne dose de passion. Bienvenue chez Burger House.</p>
+          <div class='hero-actions'>
+            <a class='button button-primary' href='#menu'>Voir le menu <span>↗</span></a>
+            <a class='button button-light' href='#histoire'>Découvrir notre histoire</a>
+          </div>
+          <div class='hero-meta'>
+            <div><strong>4.9/5</strong><span>★★★★★<small> avis clients</small></span></div>
+            <div class='meta-separator'></div>
+            <div><strong>100%</strong><span>Fait maison</span></div>
+          </div>
+        </div>
+        <div class='hero-visual'>
+          <div class='burst'>NOUVEAU<br><strong>MENU</strong></div>
+          <div class='hero-burger'>
+            <div class='burger-shadow'></div>
+            <div class='bun-top'><span class='sesame s1'></span><span class='sesame s2'></span><span class='sesame s3'></span><span class='sesame s4'></span><span class='sesame s5'></span></div>
+            <div class='lettuce'></div>
+            <div class='cheese'></div>
+            <div class='patty'></div>
+            <div class='cheese cheese-bottom'></div>
+            <div class='patty second-patty'></div>
+            <div class='onion'></div>
+            <div class='bun-bottom'></div>
+          </div>
+          <div class='floating-label label-one'>🥬<span>Frais<br><b>chaque jour</b></span></div>
+          <div class='floating-label label-two'>⭐<span>Élu meilleur<br><b>burger 2024</b></span></div>
+        </div>
+      </div>
+    </section>
+
+    <section class='menu-section section-padding' id='menu'>
+      <div class='container'>
+        <div class='section-heading'>
+          <div><p class='eyebrow'>À la carte</p><h2>Nos burgers,<br><em>vos favoris.</em></h2></div>
+          <p>Du classique intemporel à la recette la plus audacieuse, il y en a pour tous les appétits.</p>
+        </div>
+        <div class='filters' role='tablist' aria-label='Catégories du menu'>
+          <button class='filter active' data-filter='all'>Tout voir</button>
+          <button class='filter' data-filter='burgers'>Burgers</button>
+          <button class='filter' data-filter='accompagnements'>Accompagnements</button>
+          <button class='filter' data-filter='desserts'>Desserts</button>
+          <button class='filter' data-filter='boissons'>Boissons</button>
+        </div>
+        <div class='product-grid' id='productGrid'></div>
+      </div>
+    </section>
+
+    <section class='story-section' id='histoire'>
+      <div class='container story-grid'>
+        <div class='story-image'><span class='story-sticker'>Depuis<br><strong>2018</strong></span><div class='counter-scene'>🍔</div></div>
+        <div class='story-copy'><p class='eyebrow'>Notre histoire</p><h2>Plus qu'un burger,<br><em>une vraie expérience.</em></h2><p>Chez Burger House, on croit qu'un bon burger commence par de bons produits. Chaque matin, nos pains sont préparés sur place et nos sauces sont réalisées dans notre cuisine.</p><p>Notre mission ? Vous faire passer un bon moment autour d'un burger généreux, préparé avec soin et servi avec le sourire.</p><a class='text-link' href='#contact'>Venez nous rencontrer <span>→</span></a></div>
+      </div>
+    </section>
+
+    <section class='contact-section section-padding' id='contact'>
+      <div class='container contact-grid'>
+        <div><p class='eyebrow'>Une question ?</p><h2>On vous<br><em>écoute.</em></h2><p class='contact-intro'>Une remarque, une envie ou une réservation de groupe ? Écrivez-nous, notre équipe vous répond rapidement.</p><div class='contact-details'><p>📍 <span>24 rue du Faubourg<br>75010 Paris</span></p><p>☎️ <span>01 42 58 12 90</span></p><p>✉️ <span>bonjour@burgerhouse.fr</span></p></div></div>
+        <form class='contact-form' id='contactForm'><div class='form-row'><label>Votre nom<input type='text' name='name' placeholder='Ex : Camille Martin' required></label><label>Votre email<input type='email' name='email' placeholder='camille@email.com' required></label></div><label>Votre message<textarea name='message' rows='5' placeholder='Dites-nous tout...' required></textarea></label><button class='button button-primary' type='submit'>Envoyer le message <span>↗</span></button><p class='form-success' id='formSuccess'>Merci ! Votre message a bien été envoyé.</p></form>
+      </div>
+    </section>
+  </main>
+
+  <footer class='site-footer'><div class='container footer-wrap'><a class='logo' href='#accueil'><span class='logo-mark'>BH</span><span>Burger<span>House</span></span></a><p>© 2024 Burger House. Fait avec ❤️ et beaucoup de cheddar.</p><div class='socials'><a href='#' aria-label='Instagram'>ig</a><a href='#' aria-label='Facebook'>fb</a><a href='#' aria-label='TikTok'>tk</a></div></div></footer>
+
+  <aside class='cart-panel' id='cartPanel' aria-label='Votre panier'><div class='cart-header'><h2>Votre panier</h2><button id='closeCart' aria-label='Fermer le panier'>×</button></div><div class='cart-items' id='cartItems'><div class='empty-cart'>🛍️<strong>Votre panier est vide</strong><span>Ajoutez un burger pour commencer.</span></div></div><div class='cart-footer'><div class='total-line'><span>Sous-total</span><strong id='cartTotal'>0,00 €</strong></div><button class='button button-primary full-width' id='checkoutButton'>Passer la commande <span>→</span></button><small>Livraison et taxes calculées à l'étape suivante.</small></div></aside><div class='overlay' id='overlay'></div>
+  <script src='script.js'></script>
+</body>
+</html>
