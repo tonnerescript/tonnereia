@@ -856,39 +856,40 @@ Retourne tous les fichiers nécessaires.
 }
 
 async function downloadProject(project) {
-  const zip = new JSZip();
-
-  const files =
-    project?.files || {};
-
-  for (const [filename, content] of Object.entries(files)) {
-    zip.file(
-      filename,
-      content
-    );
+  if (!project || !project.files) {
+    throw new Error("Projet absent ou invalide.");
   }
 
-  const blob =
-    await zip.generateAsync({
-      type: "blob"
-    });
+  const zip = new JSZip();
+
+  const files = project.files;
+
+  for (const [filename, content] of Object.entries(files)) {
+    if (!filename || typeof content !== "string") {
+      continue;
+    }
+
+    zip.file(filename, content);
+  }
+
+  const projectName =
+    String(project.projectName || "tonnerreia-project")
+      .replace(/[^a-zA-Z0-9-_]/g, "-")
+      .toLowerCase();
+
+  const blob = await zip.generateAsync({
+    type: "blob"
+  });
 
   return new Response(blob, {
     status: 200,
     headers: {
-      "content-type":
-        "application/zip",
+      "content-type": "application/zip",
       "content-disposition":
-        `attachment; filename="${(
-          project.projectName ||
-          "tonnerreia-project"
-        )
-          .replace(/[^a-zA-Z0-9-_]/g, "-")
-          .toLowerCase()}.zip`
+        `attachment; filename="${projectName}.zip"`
     }
   });
 }
-
 const APP = `<!DOCTYPE html>
 <html lang="fr">
 <head>
