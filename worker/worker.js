@@ -2586,16 +2586,7 @@ body {
         css +
         "</style>";
 
-        request.method === "GET" &&
-        url.pathname === "/api/status"
-      ) {
-          {
-    ok: false,
-    error: "Route introuvable."
-  },
-  404
-);return json({      if (
-        /<\/head>/i.test(page)
+      if (\n        /<\\/head>/i.test(page)\n      ) {\n        /<\/head>/i.test(page)
       ) {
 
         page =
