@@ -7,8 +7,7 @@ const SYSTEM_PROMPT = [
   "Utilise HTML, CSS et JavaScript.",
   "Les boutons et interactions doivent fonctionner.",
   "",
-  "Réponds UNIQUEMENT avec ce format :",
-  "",
+  "FORMAT OBLIGATOIRE :",
   "PROJECT_NAME: Nom du site",
   "FILE: index.html",
   "HTML COMPLET",
@@ -71,8 +70,8 @@ function parseProject(text) {
   let match;
 
   while ((match = regex.exec(source)) !== null) {
-    const filename = match[1].toLowerCase();
-    files[filename] = match[2].trim();
+    files[match[1].toLowerCase()] =
+      match[2].trim();
   }
 
   if (!files["index.html"]) {
@@ -80,7 +79,8 @@ function parseProject(text) {
       source.match(/<!DOCTYPE html[\s\S]*<\/html>/i);
 
     if (htmlMatch) {
-      files["index.html"] = htmlMatch[0];
+      files["index.html"] =
+        htmlMatch[0];
     }
   }
 
@@ -106,14 +106,18 @@ function makePreview(project) {
     if (cssCode) {
       result = result.replace(
         /<\/head>/i,
-        "<style>" + cssCode + "</style></head>"
+        "<style>" +
+        cssCode +
+        "</style></head>"
       );
     }
 
     if (jsCode) {
       result = result.replace(
         /<\/body>/i,
-        "<script>" + jsCode + "<\/script></body>"
+        "<script>" +
+        jsCode +
+        "<\/script></body>"
       );
     }
 
@@ -165,7 +169,8 @@ async function generate(request, env) {
   if (!env.AI) {
     return json({
       ok: false,
-      error: "Cloudflare AI n'est pas configuré."
+      error:
+        "Cloudflare AI n'est pas configuré."
     }, 500);
   }
 
@@ -195,7 +200,8 @@ async function generate(request, env) {
     if (!responseText) {
       return json({
         ok: false,
-        error: "L'IA n'a renvoyé aucun résultat."
+        error:
+          "L'IA n'a renvoyé aucun résultat."
       }, 500);
     }
 
@@ -205,17 +211,15 @@ async function generate(request, env) {
     if (!project.files["index.html"]) {
       return json({
         ok: false,
-        error: "Le HTML n'a pas été généré correctement."
+        error:
+          "Le HTML n'a pas été généré correctement."
       }, 500);
     }
-
-    const preview =
-      makePreview(project);
 
     return json({
       ok: true,
       project: project,
-      preview: preview
+      preview: makePreview(project)
     });
 
   } catch (error) {
@@ -235,6 +239,7 @@ const APP = [
   '<meta charset="UTF-8">',
   '<meta name="viewport" content="width=device-width, initial-scale=1.0">',
   "<title>TonnerreIA</title>",
+
   "<style>",
 
   "*{box-sizing:border-box}",
@@ -321,7 +326,7 @@ const APP = [
   "border-color:#7165ff;",
   "}",
 
-  "button{",
+  ".generate{",
   "width:100%;",
   "margin-top:12px;",
   "padding:17px;",
@@ -334,7 +339,7 @@ const APP = [
   "cursor:pointer;",
   "}",
 
-  "button:disabled{",
+  ".generate:disabled{",
   "opacity:.5;",
   "cursor:wait;",
   "}",
@@ -355,14 +360,16 @@ const APP = [
   "border:1px solid #292c42;",
   "border-radius:18px;",
   "overflow:hidden;",
-  "background:#fff;",
+  "background:#171923;",
   "}",
 
   ".previewHeader{",
-  "height:60px;",
+  "min-height:60px;",
   "display:flex;",
   "align-items:center;",
-  "padding:0 18px;",
+  "justify-content:space-between;",
+  "gap:10px;",
+  "padding:10px 15px;",
   "background:#10121f;",
   "color:white;",
   "}",
@@ -371,12 +378,56 @@ const APP = [
   "font-weight:bold;",
   "}",
 
-  "iframe{",
-  "display:block;",
+  ".previewButtons{",
+  "display:flex;",
+  "gap:7px;",
+  "}",
+
+  ".deviceButton{",
+  "width:auto;",
+  "margin:0;",
+  "padding:8px 12px;",
+  "border:1px solid #34384f;",
+  "border-radius:9px;",
+  "background:#1b1e30;",
+  "color:white;",
+  "font-size:13px;",
+  "cursor:pointer;",
+  "}",
+
+  ".deviceButton.active{",
+  "background:#6655ff;",
+  "border-color:#6655ff;",
+  "}",
+
+  "#previewArea{",
   "width:100%;",
   "height:650px;",
+  "display:flex;",
+  "justify-content:center;",
+  "align-items:stretch;",
+  "overflow:auto;",
+  "background:#171923;",
+  "}",
+
+  "#preview{",
+  "width:100%;",
+  "height:100%;",
   "border:0;",
   "background:white;",
+  "transition:width .3s;",
+  "}",
+
+  "#previewArea.phone{",
+  "align-items:center;",
+  "}",
+
+  "#previewArea.phone #preview{",
+  "width:390px;",
+  "max-width:390px;",
+  "height:620px;",
+  "border-radius:20px;",
+  "box-shadow:0 0 0 6px #05060a;",
   "}",
 
   ".files{",
@@ -395,46 +446,118 @@ const APP = [
   "}",
 
   "@media(max-width:700px){",
-  ".container{padding-top:40px}",
-  "iframe{height:600px}",
-  ".files{grid-template-columns:1fr}",
+
+  ".container{",
+  "padding-top:40px;",
+  "}",
+
+  ".previewHeader{",
+  "align-items:flex-start;",
+  "flex-direction:column;",
+  "}",
+
+  ".previewButtons{",
+  "width:100%;",
+  "}",
+
+  ".deviceButton{",
+  "flex:1;",
+  "}",
+
+  "#previewArea{",
+  "height:600px;",
+  "}",
+
+  "#previewArea.phone #preview{",
+  "width:360px;",
+  "max-width:calc(100% - 30px);",
+  "height:570px;",
+  "}",
+
+  ".files{",
+  "grid-template-columns:1fr;",
+  "}",
+
   "}",
 
   "</style>",
   "</head>",
+
   "<body>",
 
   '<header class="header">',
-  '<div class="logo">⚡ Tonnerre<span>IA</span></div>',
-  '<div class="online">● IA en ligne</div>',
+
+  '<div class="logo">',
+  '⚡ Tonnerre<span>IA</span>',
+  "</div>",
+
+  '<div class="online">',
+  "● IA en ligne",
+  "</div>",
+
   "</header>",
 
   '<main class="container">',
 
   '<section class="hero">',
-  '<div class="badge">✦ Générateur de vrais sites web</div>',
-  "<h1>Crée ton site avec TonnerreIA</h1>",
+
+  '<div class="badge">',
+  "✦ Générateur de vrais sites web",
+  "</div>",
+
+  "<h1>",
+  "Crée ton site avec TonnerreIA",
+  "</h1>",
+
   "<p>",
   "Décris ton idée et TonnerreIA crée automatiquement ",
   "le HTML, le CSS et le JavaScript de ton site.",
   "</p>",
+
   "</section>",
 
   '<section class="generator">',
 
-  '<textarea id="prompt" placeholder="Exemple : crée-moi un site moderne pour un restaurant italien avec menu, galerie, réservation et contact..."></textarea>',
+  '<textarea id="prompt" ',
+  'placeholder="Exemple : crée-moi un site moderne pour un restaurant italien avec menu, galerie, réservation et contact...">',
+  "</textarea>",
 
-  '<button id="generate">⚡ Générer mon site</button>',
+  '<button class="generate" id="generate">',
+  "⚡ Générer mon site",
+  "</button>",
 
   '<div id="message"></div>',
 
   '<div id="previewBox">',
 
   '<div class="previewHeader">',
-  '<div id="previewTitle">⚡ Site généré</div>',
+
+  '<div id="previewTitle">',
+  "⚡ Site généré",
   "</div>",
 
-  '<iframe id="preview" title="Aperçu du site" sandbox="allow-scripts allow-forms"></iframe>',
+  '<div class="previewButtons">',
+
+  '<button class="deviceButton active" id="pcButton">',
+  "🖥️ PC",
+  "</button>",
+
+  '<button class="deviceButton" id="phoneButton">',
+  "📱 Téléphone",
+  "</button>",
+
+  "</div>",
+
+  "</div>",
+
+  '<div id="previewArea">',
+
+  '<iframe id="preview" ',
+  'title="Aperçu du site généré" ',
+  'sandbox="allow-scripts allow-forms">',
+  "</iframe>",
+
+  "</div>",
 
   "</div>",
 
@@ -447,6 +570,7 @@ const APP = [
   "</div>",
 
   "</section>",
+
   "</main>",
 
   "<script>",
@@ -458,11 +582,32 @@ const APP = [
   'const preview=document.getElementById("preview");',
   'const previewTitle=document.getElementById("previewTitle");',
   'const files=document.getElementById("files");',
+  'const previewArea=document.getElementById("previewArea");',
+  'const pcButton=document.getElementById("pcButton");',
+  'const phoneButton=document.getElementById("phoneButton");',
 
   "function showMessage(text){",
   'message.style.display="block";',
   "message.textContent=text;",
   "}",
+
+  'pcButton.addEventListener("click",function(){',
+
+  'previewArea.classList.remove("phone");',
+
+  'pcButton.classList.add("active");',
+  'phoneButton.classList.remove("active");',
+
+  "});",
+
+  'phoneButton.addEventListener("click",function(){',
+
+  'previewArea.classList.add("phone");',
+
+  'phoneButton.classList.add("active");',
+  'pcButton.classList.remove("active");',
+
+  "});",
 
   'button.addEventListener("click",async function(){',
 
@@ -474,12 +619,12 @@ const APP = [
   "}",
 
   "button.disabled=true;",
-  'button.textContent="⚡ Création du site...";',
+  'button.textContent="⚡ TonnerreIA construit le site...";',
 
   'previewBox.style.display="none";',
   'files.style.display="none";',
 
-  'showMessage("⏳ TonnerreIA génère ton vrai site...");',
+  'showMessage("⏳ Génération du vrai site en cours...");',
 
   "try{",
 
@@ -492,7 +637,7 @@ const APP = [
   "const data=await response.json();",
 
   "if(!response.ok||!data.ok){",
-  'throw new Error(data.error||"Erreur de génération.");',
+  'throw new Error(data.error||"Erreur pendant la génération.");',
   "}",
 
   "previewTitle.textContent='⚡ '+(data.project.projectName||'Site généré');",
@@ -523,6 +668,7 @@ const APP = [
   "});",
 
   "</script>",
+
   "</body>",
   "</html>"
 ].join("\n");
@@ -556,7 +702,10 @@ export default {
       request.method === "POST" &&
       url.pathname === "/api/generate"
     ) {
-      return generate(request, env);
+      return generate(
+        request,
+        env
+      );
     }
 
     return json({
