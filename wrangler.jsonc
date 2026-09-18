@@ -1,0 +1,10 @@
+{
+  "$schema": "https://unpkg.com/wrangler@4/config-schema.json",
+  "name": "tonnerreia",
+  "main": "worker/worker.js",
+  "compatibility_date": "2026-09-18",
+  "workers_dev": true,
+  "ai": {
+    "binding": "AI"
+  }
+}
