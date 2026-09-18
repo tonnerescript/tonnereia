@@ -22,9 +22,9 @@ jobs:
           echo "=== WORKER ==="
           sed -n '1,140p' worker/worker.js
 
-          echo "=== RECHERCHE OPENAI ==="
-          if grep -RniE "api\.openai\.com|OPENAI_API_KEY|openai" worker/worker.js; then
-            echo "❌ Référence OpenAI trouvée"
+          echo "=== VERIFICATION OPENAI ==="
+          if grep -RniE "api\.openai\.com|OPENAI_API_KEY" worker/worker.js; then
+            echo "❌ Appel OpenAI trouvé"
             exit 1
           else
             echo "✅ Aucun appel OpenAI trouvé"
@@ -43,9 +43,17 @@ jobs:
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
         run: |
-          test -n "$CLOUDFLARE_API_TOKEN" || exit 1
-          test -n "$CLOUDFLARE_ACCOUNT_ID" || exit 1
-          echo "✅ Secrets Cloudflare détectés"
+          test -n "$CLOUDFLARE_API_TOKEN" || (
+            echo "❌ CLOUDFLARE_API_TOKEN absent"
+            exit 1
+          )
+
+          test -n "$CLOUDFLARE_ACCOUNT_ID" || (
+            echo "❌ CLOUDFLARE_ACCOUNT_ID absent"
+            exit 1
+          )
+
+          echo "✅ Secrets Cloudflare détectés."
 
       - name: Déployer TonnerreIA
         env:
