@@ -4,54 +4,67 @@ const SYSTEM_PROMPT = [
   "Tu es TonnerreIA, une IA experte en création de sites web.",
   "",
   "MISSION :",
-  "À partir de la demande de l'utilisateur, conçois automatiquement un site complet, moderne, intéressant et professionnel.",
-  "Tu dois réfléchir à la meilleure structure pour le projet au lieu d'utiliser toujours le même modèle.",
+  "Crée automatiquement un vrai site web moderne, complet, intéressant et professionnel à partir de la demande.",
+  "Analyse le projet avant de choisir sa structure.",
+  "Tu décides toi-même si une ou plusieurs pages sont nécessaires.",
   "",
   "MODE CRÉATIF AUTOMATIQUE :",
-  "1. Analyse le type de projet.",
-  "2. Identifie le public et l'objectif du site.",
-  "3. Choisis une direction artistique cohérente.",
-  "4. Choisis automatiquement les sections utiles.",
-  "5. Organise les informations de façon claire.",
-  "6. Ajoute des interactions JavaScript utiles.",
-  "7. Adapte le design au téléphone et à l'ordinateur.",
-  "8. Évite les sections inutiles.",
-  "9. Donne au site une vraie identité visuelle.",
-  "10. Fais fonctionner les boutons et interactions lorsque cela est possible.",
+  "- Analyse le type de projet.",
+  "- Comprends son objectif.",
+  "- Identifie le public.",
+  "- Choisis une identité visuelle.",
+  "- Choisis les sections utiles.",
+  "- Choisis le nombre de pages adapté.",
+  "- Ajoute des interactions utiles.",
+  "- Crée une navigation cohérente.",
+  "- Adapte le résultat au téléphone, à la tablette et au PC.",
+  "",
+  "PAGES :",
+  "Si plusieurs pages sont utiles, crée-les.",
+  "Utilise uniquement ces noms :",
+  "index.html",
+  "about.html",
+  "services.html",
+  "products.html",
+  "projects.html",
+  "contact.html",
+  "gallery.html",
+  "booking.html",
+  "faq.html",
+  "",
+  "Tu peux utiliser d'autres noms simples en .html si le projet le nécessite.",
+  "",
+  "IMPORTANT :",
+  "Toutes les pages doivent partager le même style.css et script.js.",
+  "Les liens de navigation doivent fonctionner entre les pages.",
+  "Chaque page doit être complète.",
   "",
   "DESIGN :",
-  "- Utilise une palette de couleurs cohérente.",
-  "- Utilise de belles typographies système ou Google Fonts si pertinent.",
-  "- Utilise des cartes, boutons, badges et sections modernes.",
-  "- Utilise des animations légères et professionnelles.",
-  "- Crée une hiérarchie visuelle claire.",
-  "- Évite un résultat vide ou trop basique.",
-  "- Le résultat doit ressembler à un vrai site professionnel.",
+  "- Design professionnel.",
+  "- Belle hiérarchie visuelle.",
+  "- Couleurs cohérentes.",
+  "- Cartes modernes.",
+  "- Boutons modernes.",
+  "- Animations légères.",
+  "- Effets hover.",
+  "- Sections bien espacées.",
+  "- Design responsive.",
   "",
-  "STRUCTURE :",
-  "La structure doit être décidée automatiquement selon le projet.",
-  "Par exemple, un restaurant peut avoir hero, menu, spécialités, galerie, avis, réservation et contact.",
-  "Un portfolio peut avoir hero, projets, compétences, expérience, à propos et contact.",
-  "Une boutique peut avoir hero, produits, catégories, promotions, avis et contact.",
-  "Ne force jamais toutes ces sections si elles ne sont pas adaptées.",
-  "",
-  "RESPONSIVE :",
-  "Le site doit fonctionner correctement sur ordinateur, tablette et téléphone.",
+  "INTERACTIONS :",
+  "Utilise JavaScript lorsque cela apporte quelque chose.",
+  "Exemples : menu mobile, FAQ, formulaire, filtres, galerie, modal, compteur, animations.",
   "",
   "IMAGES :",
-  "Tu peux utiliser des images distantes avec des URLs publiques lorsqu'elles améliorent réellement le design.",
-  "Privilégie des images cohérentes avec le thème.",
-  "",
-  "CODE :",
-  "Le HTML doit être complet.",
-  "Le CSS doit être complet.",
-  "Le JavaScript doit être complet.",
-  "Évite les dépendances inutiles.",
+  "Tu peux utiliser des images publiques distantes si elles améliorent réellement le site.",
   "",
   "FORMAT OBLIGATOIRE :",
   "PROJECT_NAME: Nom du site",
+  "FILES_COUNT: nombre",
   "FILE: index.html",
-  "HTML COMPLET",
+  "CONTENU COMPLET",
+  "END_FILE",
+  "FILE: autre.html",
+  "CONTENU COMPLET",
   "END_FILE",
   "FILE: style.css",
   "CSS COMPLET",
@@ -60,32 +73,31 @@ const SYSTEM_PROMPT = [
   "JAVASCRIPT COMPLET",
   "END_FILE",
   "",
-  "IMPORTANT :",
   "Ne mets aucun markdown.",
   "Ne mets jamais de ```.",
-  "Retourne uniquement le format demandé."
+  "Retourne uniquement les fichiers."
 ].join("\n");
 
 const EDIT_SYSTEM_PROMPT = [
-  "Tu es TonnerreIA, une IA experte en modification de sites web.",
-  "",
-  "Tu reçois un site existant et une demande de modification.",
+  "Tu es TonnerreIA.",
+  "Tu modifies un site web existant de façon intelligente.",
   "",
   "OBJECTIF :",
-  "Applique la modification demandée intelligemment.",
-  "Conserve les fonctionnalités existantes qui ne sont pas concernées.",
-  "Améliore la cohérence visuelle si nécessaire.",
-  "Ne supprime pas des éléments importants sans raison.",
-  "Le résultat doit rester professionnel et responsive.",
-  "",
-  "MODE CRÉATIF :",
-  "Si la demande est vague, prends des décisions de design cohérentes.",
-  "Si l'utilisateur demande d'améliorer le site, améliore réellement sa structure, son design et ses interactions.",
+  "Applique la demande de modification.",
+  "Conserve les fonctionnalités existantes.",
+  "Conserve les pages existantes sauf si la demande demande leur suppression.",
+  "Si la modification nécessite une nouvelle page, crée-la.",
+  "Si la modification concerne plusieurs pages, mets-les toutes à jour.",
+  "Garde une identité visuelle cohérente.",
+  "Le site doit rester responsive.",
   "",
   "FORMAT OBLIGATOIRE :",
   "PROJECT_NAME: Nom du site",
   "FILE: index.html",
-  "HTML COMPLET",
+  "CONTENU COMPLET",
+  "END_FILE",
+  "FILE: autres-pages.html",
+  "CONTENU COMPLET",
   "END_FILE",
   "FILE: style.css",
   "CSS COMPLET",
@@ -94,9 +106,9 @@ const EDIT_SYSTEM_PROMPT = [
   "JAVASCRIPT COMPLET",
   "END_FILE",
   "",
+  "Retourne toutes les pages et les deux fichiers communs complets.",
   "Ne mets aucun markdown.",
-  "Ne mets jamais de ```.",
-  "Retourne les trois fichiers COMPLETS."
+  "Ne mets jamais de ```."
 ].join("\n");
 
 function json(data, status = 200) {
@@ -140,14 +152,10 @@ function parseProject(text) {
     ? nameMatch[1].trim()
     : "Site généré par TonnerreIA";
 
-  const files = {
-    "index.html": "",
-    "style.css": "",
-    "script.js": ""
-  };
+  const files = {};
 
   const regex =
-    /FILE:\s*(index\.html|style\.css|script\.js)\s*\n([\s\S]*?)\s*END_FILE/gi;
+    /FILE:\s*([a-zA-Z0-9_-]+\.html|style\.css|script\.js)\s*\n([\s\S]*?)\s*END_FILE/gi;
 
   let match;
 
@@ -163,7 +171,8 @@ function parseProject(text) {
     );
 
     if (htmlMatch) {
-      files["index.html"] = htmlMatch[0].trim();
+      files["index.html"] =
+        htmlMatch[0].trim();
     }
   }
 
@@ -173,92 +182,135 @@ function parseProject(text) {
   };
 }
 
-function makePreview(project) {
-  const htmlCode =
-    project.files["index.html"] || "";
+function injectAssets(page, css, js) {
+  let result = page;
 
-  const cssCode =
-    project.files["style.css"] || "";
-
-  const jsCode =
-    project.files["script.js"] || "";
-
-  if (
-    /<html[\s\S]*<\/html>/i.test(
-      htmlCode
-    )
-  ) {
-    let result = htmlCode;
-
-    if (cssCode) {
+  if (css) {
+    if (/<\/head>/i.test(result)) {
       result = result.replace(
         /<\/head>/i,
         "<style>" +
-          cssCode +
+          css +
           "</style></head>"
       );
+    } else {
+      result =
+        "<style>" +
+        css +
+        "</style>" +
+        result;
     }
+  }
 
-    if (jsCode) {
+  if (js) {
+    if (/<\/body>/i.test(result)) {
       result = result.replace(
         /<\/body>/i,
         "<script>" +
-          jsCode +
+          js +
           "<\/script></body>"
       );
+    } else {
+      result +=
+        "<script>" +
+        js +
+        "<\/script>";
     }
-
-    return result;
   }
 
-  return [
-    "<!DOCTYPE html>",
-    '<html lang="fr">',
-    "<head>",
-    '<meta charset="UTF-8">',
-    '<meta name="viewport" content="width=device-width, initial-scale=1.0">',
-    "<style>",
-    cssCode,
-    "</style>",
-    "</head>",
-    "<body>",
-    htmlCode,
-    "<script>",
-    jsCode,
-    "<\/script>",
-    "</body>",
-    "</html>"
-  ].join("\n");
+  return result;
 }
 
-async function callAI(env, systemPrompt, userPrompt) {
-  const result = await env.AI.run(
-    AI_MODEL,
-    {
-      messages: [
-        {
-          role: "system",
-          content: systemPrompt
-        },
-        {
-          role: "user",
-          content: userPrompt
-        }
-      ],
-      max_tokens: 7000
+function makePreview(project) {
+  const files = project.files || {};
+
+  const css =
+    files["style.css"] || "";
+
+  const js =
+    files["script.js"] || "";
+
+  const pages = {};
+
+  for (const filename of Object.keys(files)) {
+    if (
+      filename.endsWith(".html") &&
+      files[filename]
+    ) {
+      pages[filename] =
+        injectAssets(
+          files[filename],
+          css,
+          js
+        );
     }
-  );
+  }
 
-  return result && result.response
-    ? result.response
-    : "";
+  if (!pages["index.html"]) {
+    pages["index.html"] = [
+      "<!DOCTYPE html>",
+      '<html lang="fr">',
+      "<head>",
+      '<meta charset="UTF-8">',
+      '<meta name="viewport" content="width=device-width, initial-scale=1.0">',
+      "<style>",
+      css,
+      "</style>",
+      "</head>",
+      "<body>",
+      "<h1>Site généré par TonnerreIA</h1>",
+      "<script>",
+      js,
+      "<\/script>",
+      "</body>",
+      "</html>"
+    ].join("\n");
+  }
+
+  return {
+    main: pages["index.html"],
+    pages
+  };
 }
 
-async function generateSite(request, env) {
+async function callAI(
+  env,
+  systemPrompt,
+  userPrompt
+) {
+  const result =
+    await env.AI.run(
+      AI_MODEL,
+      {
+        messages: [
+          {
+            role: "system",
+            content: systemPrompt
+          },
+          {
+            role: "user",
+            content: userPrompt
+          }
+        ],
+        max_tokens: 7000
+      }
+    );
+
+  return result &&
+    result.response
+      ? result.response
+      : "";
+}
+
+async function generateSite(
+  request,
+  env
+) {
   let body;
 
   try {
-    body = await request.json();
+    body =
+      await request.json();
   } catch (error) {
     return json(
       {
@@ -269,9 +321,10 @@ async function generateSite(request, env) {
     );
   }
 
-  const prompt = String(
-    body.prompt || ""
-  ).trim();
+  const prompt =
+    String(
+      body.prompt || ""
+    ).trim();
 
   if (!prompt) {
     return json(
@@ -295,30 +348,33 @@ async function generateSite(request, env) {
   }
 
   const creativePrompt = [
-    "Crée ce projet avec le MODE CRÉATIF AUTOMATIQUE.",
+    "Active le MODE CRÉATIF AUTOMATIQUE.",
     "",
-    "DEMANDE DE L'UTILISATEUR :",
+    "DEMANDE :",
     prompt,
     "",
-    "Analyse la demande et décide toi-même :",
-    "- la structure du site",
+    "Décide automatiquement :",
+    "- la structure",
+    "- le nombre de pages",
     "- les sections",
-    "- la direction artistique",
+    "- le design",
     "- les couleurs",
-    "- les composants",
-    "- les animations",
     "- les interactions",
-    "- la mise en page responsive",
+    "- la navigation",
+    "- le responsive",
     "",
-    "Le site doit être complet et immédiatement présentable.",
+    "Crée un résultat qui ressemble à un vrai site professionnel.",
+    "Ne crée pas plusieurs pages simplement pour en créer.",
+    "Utilise plusieurs pages lorsque cela améliore réellement le projet."
   ].join("\n");
 
   try {
-    const responseText = await callAI(
-      env,
-      SYSTEM_PROMPT,
-      creativePrompt
-    );
+    const responseText =
+      await callAI(
+        env,
+        SYSTEM_PROMPT,
+        creativePrompt
+      );
 
     if (!responseText) {
       return json(
@@ -332,9 +388,13 @@ async function generateSite(request, env) {
     }
 
     const project =
-      parseProject(responseText);
+      parseProject(
+        responseText
+      );
 
-    if (!project.files["index.html"]) {
+    if (
+      !project.files["index.html"]
+    ) {
       return json(
         {
           ok: false,
@@ -345,17 +405,26 @@ async function generateSite(request, env) {
       );
     }
 
+    const preview =
+      makePreview(project);
+
     return json({
       ok: true,
       project,
-      preview: makePreview(project)
+      preview: preview.main,
+      pages: preview.pages,
+      pageNames:
+        Object.keys(
+          preview.pages
+        )
     });
   } catch (error) {
     return json(
       {
         ok: false,
         error: String(
-          error.message || error
+          error.message ||
+          error
         )
       },
       500
@@ -363,11 +432,15 @@ async function generateSite(request, env) {
   }
 }
 
-async function editSite(request, env) {
+async function editSite(
+  request,
+  env
+) {
   let body;
 
   try {
-    body = await request.json();
+    body =
+      await request.json();
   } catch (error) {
     return json(
       {
@@ -378,9 +451,10 @@ async function editSite(request, env) {
     );
   }
 
-  const change = String(
-    body.change || ""
-  ).trim();
+  const change =
+    String(
+      body.change || ""
+    ).trim();
 
   const current =
     body.project || {};
@@ -399,7 +473,9 @@ async function editSite(request, env) {
     );
   }
 
-  if (!currentFiles["index.html"]) {
+  if (
+    !currentFiles["index.html"]
+  ) {
     return json(
       {
         ok: false,
@@ -421,37 +497,57 @@ async function editSite(request, env) {
     );
   }
 
-  const editPrompt = [
-    "Voici le site actuel.",
-    "",
-    "NOM DU PROJET :",
+  const siteParts = [];
+
+  siteParts.push(
+    "NOM DU PROJET :"
+  );
+
+  siteParts.push(
     String(
       current.projectName ||
-        "Site généré"
-    ),
-    "",
-    "===== INDEX.HTML =====",
-    currentFiles["index.html"],
-    "",
-    "===== STYLE.CSS =====",
-    currentFiles["style.css"] || "",
-    "",
-    "===== SCRIPT.JS =====",
-    currentFiles["script.js"] || "",
-    "",
-    "===== DEMANDE DE MODIFICATION =====",
-    change,
-    "",
-    "Applique maintenant la modification.",
-    "Retourne les trois fichiers complets."
-  ].join("\n");
+      "Site généré"
+    )
+  );
+
+  siteParts.push("");
+
+  for (
+    const filename of
+    Object.keys(currentFiles)
+  ) {
+    siteParts.push(
+      "===== " +
+      filename +
+      " ====="
+    );
+
+    siteParts.push(
+      currentFiles[filename] || ""
+    );
+
+    siteParts.push("");
+  }
+
+  siteParts.push(
+    "===== MODIFICATION DEMANDÉE ====="
+  );
+
+  siteParts.push(change);
+
+  siteParts.push("");
+
+  siteParts.push(
+    "Retourne toutes les pages complètes."
+  );
 
   try {
-    const responseText = await callAI(
-      env,
-      EDIT_SYSTEM_PROMPT,
-      editPrompt
-    );
+    const responseText =
+      await callAI(
+        env,
+        EDIT_SYSTEM_PROMPT,
+        siteParts.join("\n")
+      );
 
     if (!responseText) {
       return json(
@@ -465,9 +561,13 @@ async function editSite(request, env) {
     }
 
     const project =
-      parseProject(responseText);
+      parseProject(
+        responseText
+      );
 
-    if (!project.files["index.html"]) {
+    if (
+      !project.files["index.html"]
+    ) {
       return json(
         {
           ok: false,
@@ -478,17 +578,26 @@ async function editSite(request, env) {
       );
     }
 
+    const preview =
+      makePreview(project);
+
     return json({
       ok: true,
       project,
-      preview: makePreview(project)
+      preview: preview.main,
+      pages: preview.pages,
+      pageNames:
+        Object.keys(
+          preview.pages
+        )
     });
   } catch (error) {
     return json(
       {
         ok: false,
         error: String(
-          error.message || error
+          error.message ||
+          error
         )
       },
       500
@@ -535,7 +644,6 @@ const APP = [
   ".logo{",
   "font-size:22px;",
   "font-weight:800;",
-  "letter-spacing:-.5px;",
   "}",
 
   ".logo span{",
@@ -557,7 +665,6 @@ const APP = [
 
   ".badge{",
   "display:inline-flex;",
-  "align-items:center;",
   "padding:8px 14px;",
   "border:1px solid #332e62;",
   "border-radius:999px;",
@@ -575,7 +682,7 @@ const APP = [
   "}",
 
   ".hero p{",
-  "max-width:700px;",
+  "max-width:720px;",
   "margin:0 auto;",
   "color:#9ca4bc;",
   "font-size:17px;",
@@ -600,10 +707,6 @@ const APP = [
   "line-height:1.5;",
   "}",
 
-  "textarea::placeholder{",
-  "color:#666d84;",
-  "}",
-
   "textarea:focus{",
   "border-color:#7565ff;",
   "box-shadow:0 0 0 3px rgba(117,101,255,.12);",
@@ -620,22 +723,15 @@ const APP = [
   "font-size:16px;",
   "font-weight:800;",
   "cursor:pointer;",
-  "transition:.2s;",
   "}",
 
   ".editButton{",
   "background:linear-gradient(135deg,#9a55ff,#e34cff);",
   "}",
 
-  ".generate:hover,.editButton:hover{",
-  "transform:translateY(-1px);",
-  "filter:brightness(1.08);",
-  "}",
-
   "button:disabled{",
   "opacity:.55;",
   "cursor:wait;",
-  "transform:none!important;",
   "}",
 
   "#message{",
@@ -654,7 +750,7 @@ const APP = [
   "}",
 
   ".editTitle{",
-  "margin-bottom:10px;",
+  "margin-bottom:8px;",
   "font-size:16px;",
   "font-weight:800;",
   "}",
@@ -672,7 +768,6 @@ const APP = [
   "border-radius:20px;",
   "overflow:hidden;",
   "background:#171923;",
-  "box-shadow:0 20px 80px rgba(0,0,0,.3);",
   "}",
 
   ".previewHeader{",
@@ -719,7 +814,6 @@ const APP = [
   "align-items:stretch;",
   "overflow:auto;",
   "background:#181a23;",
-  "padding:0;",
   "}",
 
   "#preview{",
@@ -727,7 +821,6 @@ const APP = [
   "height:100%;",
   "border:0;",
   "background:#fff;",
-  "transition:width .25s,height .25s;",
   "}",
 
   "#previewArea.phone{",
@@ -741,6 +834,30 @@ const APP = [
   "height:620px;",
   "border-radius:24px;",
   "box-shadow:0 0 0 7px #05060a,0 20px 60px rgba(0,0,0,.5);",
+  "}",
+
+  "#pageSelector{",
+  "display:none;",
+  "padding:10px 15px;",
+  "border-top:1px solid #292d44;",
+  "background:#10121f;",
+  "overflow-x:auto;",
+  "gap:8px;",
+  "}",
+
+  ".pageButton{",
+  "flex:0 0 auto;",
+  "padding:9px 13px;",
+  "border:1px solid #34384f;",
+  "border-radius:9px;",
+  "background:#1a1d2d;",
+  "color:#fff;",
+  "cursor:pointer;",
+  "}",
+
+  ".pageButton.active{",
+  "background:#6756ff;",
+  "border-color:#6756ff;",
   "}",
 
   ".files{",
@@ -825,14 +942,14 @@ const APP = [
   "<h1>Crée ton site avec TonnerreIA</h1>",
 
   "<p>",
-  "Décris simplement ton idée. TonnerreIA analyse ton projet et construit automatiquement la structure, le design et les fonctionnalités adaptées.",
+  "Décris ton idée. TonnerreIA choisit automatiquement la structure, le design, les fonctionnalités et le nombre de pages adaptés à ton projet.",
   "</p>",
 
   "</section>",
 
   '<section class="generator">',
 
-  '<textarea id="prompt" placeholder="Exemple : crée-moi un site moderne pour un restaurant italien avec réservation, menu, galerie et avis clients..."></textarea>',
+  '<textarea id="prompt" placeholder="Exemple : crée-moi un site professionnel pour une agence immobilière avec accueil, biens, agence, avis et contact..."></textarea>',
 
   '<button class="generate" id="generate">',
   "⚡ Générer mon site",
@@ -842,16 +959,16 @@ const APP = [
 
   '<div id="editBox">',
 
- "<div class=\"editTitle\">✏️ Modifier ton site avec l'IA</div>",
+  '<div class="editTitle">✏️ Modifier ton site avec l’IA</div>',
 
   '<p class="editHint">',
-  "Décris ce que tu veux changer. TonnerreIA conservera le reste du site.",
+  "Demande une modification et TonnerreIA mettra à jour les pages concernées.",
   "</p>",
 
-  '<textarea id="change" placeholder="Exemple : rends le site plus premium, ajoute une section tarifs et transforme les couleurs en noir et or..."></textarea>',
+  '<textarea id="change" placeholder="Exemple : ajoute une page tarifs, rends le design plus premium et ajoute des animations..."></textarea>',
 
   '<button class="editButton" id="edit">',
-  "✏️ Modifier avec l'IA",
+  "✏️ Modifier avec l’IA",
   "</button>",
 
   "</div>",
@@ -872,6 +989,8 @@ const APP = [
 
   "</div>",
 
+  '<div id="pageSelector"></div>',
+
   '<div id="previewArea">',
 
   '<iframe id="preview" title="Aperçu du site généré" sandbox="allow-scripts allow-forms"></iframe>',
@@ -880,13 +999,7 @@ const APP = [
 
   "</div>",
 
-  '<div class="files" id="files">',
-
-  '<div class="file">📄 index.html</div>',
-  '<div class="file">🎨 style.css</div>',
-  '<div class="file">⚙️ script.js</div>',
-
-  "</div>",
+  '<div class="files" id="files"></div>',
 
   "</section>",
 
@@ -905,19 +1018,91 @@ const APP = [
   'const previewTitle=document.getElementById("previewTitle");',
   'const files=document.getElementById("files");',
   'const previewArea=document.getElementById("previewArea");',
+  'const pageSelector=document.getElementById("pageSelector");',
   'const pcButton=document.getElementById("pcButton");',
   'const phoneButton=document.getElementById("phoneButton");',
 
   "let currentProject=null;",
+  "let currentPages={};",
 
   "function showMessage(text){",
   'message.style.display="block";',
   "message.textContent=text;",
   "}",
 
+  "function escapeHtml(text){",
+  "return String(text)",
+  ".replace(/&/g,'&amp;')",
+  ".replace(/</g,'&lt;')",
+  ".replace(/>/g,'&gt;')",
+  ".replace(/\"/g,'&quot;')",
+  ".replace(/'/g,'&#039;');",
+  "}",
+
+  "function renderPageButtons(pageNames){",
+
+  "pageSelector.innerHTML='';",
+
+  "if(!pageNames||pageNames.length<=1){",
+  'pageSelector.style.display="none";',
+  "return;",
+  "}",
+
+  'pageSelector.style.display="flex";',
+
+  "pageNames.forEach(function(name,index){",
+
+  "const button=document.createElement('button');",
+
+  'button.className="pageButton";',
+  "button.textContent=name;",
+  "button.addEventListener('click',function(){",
+
+  "document.querySelectorAll('.pageButton').forEach(function(item){",
+  "item.classList.remove('active');",
+  "});",
+
+  "button.classList.add('active');",
+
+  "if(currentPages[name]){",
+  "preview.srcdoc=currentPages[name];",
+  "}",
+
+  "});",
+
+  "if(index===0){",
+  "button.classList.add('active');",
+  "}",
+
+  "pageSelector.appendChild(button);",
+
+  "});",
+
+  "}",
+
+  "function renderFiles(project){",
+
+  "files.innerHTML='';",
+
+  "Object.keys(project.files||{}).forEach(function(name){",
+
+  "const div=document.createElement('div');",
+
+  'div.className="file";',
+  "div.textContent=",
+  "(name.endsWith('.html')?'📄 ':name==='style.css'?'🎨 ':'⚙️ ')+name;",
+
+  "files.appendChild(div);",
+
+  "});",
+
+  "}",
+
   "function showProject(data){",
 
   "currentProject=data.project;",
+
+  "currentPages=data.pages||{};",
 
   "previewTitle.textContent='⚡ '+(",
   "data.project.projectName||'Site généré'",
@@ -928,6 +1113,9 @@ const APP = [
   'previewBox.style.display="block";',
   'editBox.style.display="block";',
   'files.style.display="grid";',
+
+  "renderPageButtons(Object.keys(currentPages));",
+  "renderFiles(data.project);",
 
   "previewBox.scrollIntoView({",
   "behavior:'smooth',",
@@ -962,9 +1150,9 @@ const APP = [
   "}",
 
   "generateButton.disabled=true;",
-  'generateButton.textContent="⚡ Création intelligente...";',
+  'generateButton.textContent="🧠 Création intelligente...";',
 
-  'showMessage("🧠 TonnerreIA analyse ton idée et construit le site...");',
+  'showMessage("🧠 TonnerreIA analyse ton projet et construit sa structure...");',
 
   "try{",
 
@@ -982,7 +1170,9 @@ const APP = [
 
   "showProject(data);",
 
-  'showMessage("✅ Site créé avec le Mode Créatif automatique ! Tu peux maintenant le modifier.");',
+  "const count=Object.keys(data.pages||{}).length;",
+
+  'showMessage("✅ Site créé ! "+count+" page(s) générée(s) automatiquement.");',
 
   "}catch(error){",
 
@@ -1007,14 +1197,14 @@ const APP = [
   "const change=changeInput.value.trim();",
 
   "if(!change){",
-  'showMessage("⚠️ Décris la modification que tu veux.");',
+  'showMessage("⚠️ Décris la modification.");',
   "return;",
   "}",
 
   "editButton.disabled=true;",
-  'editButton.textContent="✏️ Modification en cours...";',
+  'editButton.textContent="🧠 Modification en cours...";',
 
-  'showMessage("🧠 TonnerreIA modifie le site...");',
+  'showMessage("🧠 TonnerreIA analyse toutes les pages et applique ta modification...");',
 
   "try{",
 
@@ -1037,7 +1227,7 @@ const APP = [
 
   'changeInput.value="";',
 
-  'showMessage("✅ Modification appliquée avec succès !");',
+  'showMessage("✅ Modification appliquée à ton site !");',
 
   "}catch(error){",
 
@@ -1060,6 +1250,7 @@ const APP = [
 
 export default {
   async fetch(request, env) {
+
     const url =
       new URL(request.url);
 
@@ -1079,7 +1270,8 @@ export default {
         service: "TonnerreIA",
         cloudflare: true,
         workersAI: !!env.AI,
-        creativeMode: true
+        creativeMode: true,
+        multiPage: true
       });
     }
 
