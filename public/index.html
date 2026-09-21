@@ -1,544 +1,807 @@
 <!DOCTYPE html>
 <html lang="fr">
-
 <head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<meta charset="UTF-8">
+  <title>OneScript AI</title>
 
-<meta
-    name="viewport"
-    content="width=device-width, initial-scale=1.0"
->
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
 
-<title>TonnerreIA</title>
+    body {
+      font-family: Arial, sans-serif;
+      background: #07070b;
+      color: #fff;
+      min-height: 100vh;
+    }
 
-<style>
+    header {
+      height: 70px;
+      border-bottom: 1px solid #202027;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 25px;
+      background: #0b0b10;
+    }
 
-* {
-    box-sizing: border-box;
-    margin: 0;
-    padding: 0;
-}
+    .logo {
+      font-size: 22px;
+      font-weight: bold;
+    }
 
-body {
-    font-family: Arial, sans-serif;
-    background: #09090d;
-    color: white;
-    min-height: 100vh;
-}
+    .logo span {
+      color: #8b5cf6;
+    }
 
-header {
-    height: 70px;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 0 25px;
-    background: #111116;
-    border-bottom: 1px solid #292933;
-}
+    .status {
+      font-size: 13px;
+      color: #8aff9b;
+      display: flex;
+      align-items: center;
+      gap: 7px;
+    }
 
-.logo {
-    font-size: 23px;
-    font-weight: bold;
-}
-
-.logo span {
-    color: #8b5cf6;
-}
-
-.status {
-    color: #4ade80;
-    font-size: 13px;
-}
-
-main {
-    width: 94%;
-    max-width: 1100px;
-    margin: 40px auto;
-}
-
-.hero {
-    text-align: center;
-    margin-bottom: 35px;
-}
-
-.hero h1 {
-    font-size: 44px;
-    margin-bottom: 10px;
-}
-
-.hero h1 span {
-    color: #8b5cf6;
-}
-
-.hero p {
-    color: #999;
-    font-size: 16px;
-}
-
-.card {
-    background: #111116;
-    border: 1px solid #292933;
-    border-radius: 18px;
-    padding: 22px;
-    margin-bottom: 25px;
-}
-
-label {
-    display: block;
-    margin-bottom: 12px;
-    font-weight: bold;
-}
-
-textarea {
-    width: 100%;
-    min-height: 170px;
-    resize: vertical;
-    background: #08080c;
-    color: white;
-    border: 1px solid #30303a;
-    border-radius: 12px;
-    padding: 15px;
-    font-size: 15px;
-    outline: none;
-}
-
-textarea:focus {
-    border-color: #8b5cf6;
-}
-
-.buttons {
-    display: flex;
-    gap: 10px;
-    margin-top: 15px;
-    flex-wrap: wrap;
-}
-
-button {
-    border: 0;
-    border-radius: 10px;
-    padding: 12px 18px;
-    font-size: 14px;
-    font-weight: bold;
-    cursor: pointer;
-}
-
-#generate {
-    background: #8b5cf6;
-    color: white;
-    flex: 1;
-}
-
-.secondary {
-    background: #292933;
-    color: white;
-}
-
-button:disabled {
-    opacity: 0.6;
-    cursor: wait;
-}
-
-.project-header {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 15px;
-    flex-wrap: wrap;
-    margin-bottom: 20px;
-}
-
-.project-name {
-    font-size: 21px;
-    font-weight: bold;
-}
-
-.project-description {
-    color: #999;
-    margin-top: 6px;
-}
-
-.file-list {
-    display: grid;
-    gap: 8px;
-}
-
-.file {
-    background: #08080c;
-    border: 1px solid #292933;
-    border-radius: 10px;
-    padding: 13px 15px;
-    font-family: monospace;
-    color: #d7d7e0;
-}
-
-.download {
-    display: none;
-    background: #22c55e;
-    color: white;
-    text-decoration: none;
-    border-radius: 10px;
-    padding: 12px 18px;
-    font-weight: bold;
-}
-
-#error {
-    display: none;
-    margin-top: 12px;
-    color: #f87171;
-}
-
-#loading {
-    display: none;
-    color: #a78bfa;
-    margin-top: 15px;
-}
-
-footer {
-    text-align: center;
-    color: #666;
-    padding: 30px;
-    font-size: 13px;
-}
-
-@media(max-width: 600px) {
-
-    .hero h1 {
-        font-size: 34px;
+    .dot {
+      width: 8px;
+      height: 8px;
+      background: #45ff65;
+      border-radius: 50%;
     }
 
     main {
-        margin-top: 25px;
+      max-width: 1100px;
+      margin: auto;
+      padding: 55px 20px;
+    }
+
+    .hero {
+      text-align: center;
+      margin-bottom: 40px;
+    }
+
+    .hero h1 {
+      font-size: clamp(38px, 7vw, 70px);
+      line-height: 1;
+      margin-bottom: 18px;
+    }
+
+    .hero h1 span {
+      color: #8b5cf6;
+    }
+
+    .hero p {
+      color: #9999a8;
+      max-width: 650px;
+      margin: auto;
+      line-height: 1.6;
+    }
+
+    .generator {
+      background: #101017;
+      border: 1px solid #24242f;
+      border-radius: 20px;
+      padding: 22px;
+      box-shadow: 0 20px 60px rgba(0,0,0,.35);
+    }
+
+    textarea {
+      width: 100%;
+      min-height: 180px;
+      resize: vertical;
+      background: #08080d;
+      color: white;
+      border: 1px solid #292936;
+      border-radius: 14px;
+      padding: 18px;
+      font-size: 16px;
+      outline: none;
+    }
+
+    textarea:focus {
+      border-color: #8b5cf6;
+    }
+
+    .options {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin: 15px 0;
+    }
+
+    .type {
+      background: #171720;
+      border: 1px solid #2c2c38;
+      color: #bbb;
+      padding: 10px 14px;
+      border-radius: 10px;
+      cursor: pointer;
+    }
+
+    .type.active {
+      background: #8b5cf6;
+      color: white;
+      border-color: #8b5cf6;
+    }
+
+    button {
+      border: none;
+      cursor: pointer;
+      font-weight: bold;
     }
 
     #generate {
-        flex: 100%;
+      width: 100%;
+      padding: 16px;
+      border-radius: 12px;
+      background: #8b5cf6;
+      color: white;
+      font-size: 16px;
     }
 
-}
+    #generate:hover {
+      background: #7c3aed;
+    }
 
-</style>
+    #generate:disabled {
+      opacity: .5;
+      cursor: not-allowed;
+    }
 
+    .loading {
+      display: none;
+      text-align: center;
+      padding: 25px;
+      color: #aaa;
+    }
+
+    .loading.show {
+      display: block;
+    }
+
+    .result {
+      display: none;
+      margin-top: 25px;
+    }
+
+    .result.show {
+      display: block;
+    }
+
+    .result-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 15px;
+      margin-bottom: 15px;
+      flex-wrap: wrap;
+    }
+
+    .project-name {
+      font-size: 23px;
+      font-weight: bold;
+    }
+
+    .download {
+      background: #22c55e;
+      color: #07100a;
+      padding: 12px 17px;
+      border-radius: 10px;
+    }
+
+    .files {
+      display: grid;
+      gap: 8px;
+    }
+
+    .file {
+      background: #0b0b11;
+      border: 1px solid #24242f;
+      border-radius: 10px;
+      padding: 13px 15px;
+      font-family: monospace;
+      color: #c8b5ff;
+    }
+
+    .preview {
+      margin-top: 20px;
+    }
+
+    .preview iframe {
+      width: 100%;
+      height: 500px;
+      border: 1px solid #292936;
+      border-radius: 14px;
+      background: white;
+    }
+
+    .error {
+      display: none;
+      margin-top: 15px;
+      padding: 15px;
+      background: #301217;
+      border: 1px solid #68202b;
+      color: #ff9da9;
+      border-radius: 10px;
+    }
+
+    .error.show {
+      display: block;
+    }
+
+    @media (max-width: 600px) {
+      header {
+        padding: 0 15px;
+      }
+
+      main {
+        padding: 35px 12px;
+      }
+
+      .generator {
+        padding: 14px;
+      }
+
+      .preview iframe {
+        height: 400px;
+      }
+    }
+  </style>
 </head>
-
 
 <body>
 
-
 <header>
+  <div class="logo">
+    One<span>Script</span> AI
+  </div>
 
-    <div class="logo">
-        ⚡ Tonnerre<span>IA</span>
-    </div>
-
-    <div class="status">
-        ● En ligne
-    </div>
-
+  <div class="status">
+    <span class="dot"></span>
+    AI en ligne
+  </div>
 </header>
-
 
 <main>
 
-
-<section class="hero">
-
+  <section class="hero">
     <h1>
-        Tonnerre<span>IA</span>
+      Crée n'importe quel<br>
+      <span>projet avec l'IA.</span>
     </h1>
 
     <p>
-        Décris ton idée. TonnerreIA crée le projet complet.
+      Décris simplement ce que tu veux créer.
+      OneScript AI génère automatiquement la structure,
+      les fichiers et le code de ton projet.
     </p>
+  </section>
 
-</section>
-
-
-<section class="card">
-
-    <label for="prompt">
-        🤖 Que veux-tu créer ?
-    </label>
+  <section class="generator">
 
     <textarea
-        id="prompt"
-        placeholder="Exemple : crée-moi un site internet pour un restaurant de burgers avec accueil, menu, panier et formulaire de contact..."
+      id="prompt"
+      placeholder="Exemple : Crée un bot Discord complet avec tickets, modération, logs et commandes slash..."
     ></textarea>
 
+    <div class="options">
 
-    <div class="buttons">
+      <button class="type active" data-type="auto">
+        ✨ Auto
+      </button>
 
-        <button id="generate">
-            ⚡ Créer le projet
-        </button>
+      <button class="type" data-type="website">
+        🌐 Site Web
+      </button>
 
-        <button
-            class="secondary"
-            id="clear"
-        >
-            🗑️ Effacer
-        </button>
+      <button class="type" data-type="discord-bot">
+        🤖 Bot Discord
+      </button>
+
+      <button class="type" data-type="python">
+        🐍 Python
+      </button>
+
+      <button class="type" data-type="javascript">
+        🟨 JavaScript
+      </button>
+
+      <button class="type" data-type="typescript">
+        🔷 TypeScript
+      </button>
+
+      <button class="type" data-type="react">
+        ⚛️ React
+      </button>
+
+      <button class="type" data-type="godot">
+        🎮 Godot
+      </button>
 
     </div>
 
+    <button id="generate">
+      ⚡ Générer le projet
+    </button>
 
-    <div id="loading">
-        ⏳ TonnerreIA construit ton projet...
+    <div class="loading" id="loading">
+      🧠 OneScript AI génère ton projet...
     </div>
 
+    <div class="error" id="error"></div>
 
-    <div id="error"></div>
+    <section class="result" id="result">
 
-</section>
-
-
-
-<section
-    class="card"
-    id="resultCard"
-    style="display:none;"
->
-
-
-    <div class="project-header">
+      <div class="result-header">
 
         <div>
+          <div class="project-name" id="projectName">
+            Projet
+          </div>
 
-            <div
-                class="project-name"
-                id="projectName"
-            ></div>
-
-            <div
-                class="project-description"
-                id="projectDescription"
-            ></div>
-
+          <div style="color:#888;margin-top:5px" id="projectType">
+            Type : auto
+          </div>
         </div>
 
+        <button class="download" id="download">
+          📦 Télécharger le ZIP
+        </button>
 
-        <a
-            id="download"
-            class="download"
-            href="#"
-        >
-            📦 Télécharger le ZIP
-        </a>
+      </div>
 
-    </div>
+      <div class="files" id="files"></div>
 
+      <div class="preview" id="previewContainer">
+      </div>
 
-    <h3 style="margin-bottom:12px;">
-        📁 Fichiers créés
-    </h3>
+    </section>
 
-
-    <div
-        class="file-list"
-        id="fileList"
-    ></div>
-
-
-</section>
-
+  </section>
 
 </main>
 
-
-<footer>
-
-    ⚡ TonnerreIA — Créateur de projets IA
-
-</footer>
-
-
-
 <script>
 
+const API = "";
+
+let selectedType = "auto";
+let currentProject = null;
+
 const promptInput =
-    document.getElementById("prompt");
+  document.getElementById("prompt");
 
 const generateButton =
-    document.getElementById("generate");
-
-const clearButton =
-    document.getElementById("clear");
+  document.getElementById("generate");
 
 const loading =
-    document.getElementById("loading");
+  document.getElementById("loading");
+
+const result =
+  document.getElementById("result");
 
 const errorBox =
-    document.getElementById("error");
-
-const resultCard =
-    document.getElementById("resultCard");
+  document.getElementById("error");
 
 const projectName =
-    document.getElementById("projectName");
+  document.getElementById("projectName");
 
-const projectDescription =
-    document.getElementById("projectDescription");
+const projectType =
+  document.getElementById("projectType");
 
-const fileList =
-    document.getElementById("fileList");
+const filesContainer =
+  document.getElementById("files");
 
-const download =
-    document.getElementById("download");
+const previewContainer =
+  document.getElementById("previewContainer");
 
-
-
-generateButton.addEventListener(
-    "click",
-    async () => {
-
-        const prompt =
-            promptInput.value.trim();
+const downloadButton =
+  document.getElementById("download");
 
 
-        errorBox.style.display = "none";
+/*
+ * Sélection du type de projet
+ */
+
+document.querySelectorAll(".type").forEach(button => {
+
+  button.addEventListener("click", () => {
+
+    document
+      .querySelectorAll(".type")
+      .forEach(b => b.classList.remove("active"));
+
+    button.classList.add("active");
+
+    selectedType =
+      button.dataset.type;
+
+  });
+
+});
 
 
-        if (!prompt) {
+/*
+ * Afficher une erreur
+ */
 
-            errorBox.textContent =
-                "⚠️ Décris le projet que tu veux créer.";
+function showError(message) {
 
-            errorBox.style.display =
-                "block";
+  errorBox.textContent =
+    message || "Une erreur est survenue.";
 
-            return;
+  errorBox.classList.add("show");
+
+}
+
+
+/*
+ * Génération du projet
+ */
+
+generateButton.addEventListener("click", async () => {
+
+  const prompt =
+    promptInput.value.trim();
+
+  if (!prompt) {
+
+    showError(
+      "Décris d'abord le projet que tu veux créer."
+    );
+
+    return;
+  }
+
+  errorBox.classList.remove("show");
+
+  result.classList.remove("show");
+
+  previewContainer.innerHTML = "";
+
+  filesContainer.innerHTML = "";
+
+  loading.classList.add("show");
+
+  generateButton.disabled = true;
+
+  try {
+
+    const response =
+      await fetch(
+        API + "/api/project",
+        {
+          method: "POST",
+
+          headers: {
+            "Content-Type":
+              "application/json"
+          },
+
+          body: JSON.stringify({
+            prompt,
+            type: selectedType
+          })
         }
+      );
+
+    const data =
+      await response.json();
+
+    if (!response.ok || !data.ok) {
+
+      throw new Error(
+        data.error ||
+        "La génération a échoué."
+      );
+
+    }
+
+    currentProject =
+      data.project;
+
+    displayProject(
+      currentProject
+    );
+
+  } catch (error) {
+
+    showError(
+      error.message
+    );
+
+  } finally {
+
+    loading.classList.remove("show");
+
+    generateButton.disabled = false;
+
+  }
+
+});
 
 
-        generateButton.disabled = true;
+/*
+ * Affichage du projet
+ */
 
-        generateButton.textContent =
-            "⏳ Création...";
+function displayProject(project) {
 
-        loading.style.display =
-            "block";
+  projectName.textContent =
+    project.projectName ||
+    "Projet OneScript";
 
-        resultCard.style.display =
-            "none";
+  projectType.textContent =
+    "Type : " +
+    (project.type || "auto");
 
+  filesContainer.innerHTML = "";
+
+  const files =
+    project.files || {};
+
+  Object.keys(files)
+    .sort()
+    .forEach(filename => {
+
+      const div =
+        document.createElement("div");
+
+      div.className =
+        "file";
+
+      div.textContent =
+        "📄 " + filename;
+
+      filesContainer.appendChild(div);
+
+    });
+
+  /*
+   * Aperçu automatique pour un site HTML
+   */
+
+  const htmlFile =
+    Object.keys(files).find(
+      name =>
+        name.toLowerCase() ===
+        "index.html"
+    );
+
+  if (
+    htmlFile &&
+    files[htmlFile]
+  ) {
+
+    const iframe =
+      document.createElement("iframe");
+
+    iframe.setAttribute(
+      "sandbox",
+      "allow-scripts"
+    );
+
+    iframe.srcdoc =
+      buildPreview(files);
+
+    previewContainer.innerHTML =
+      "<h3 style='margin-bottom:12px'>👁️ Aperçu</h3>";
+
+    previewContainer.appendChild(
+      iframe
+    );
+
+  }
+
+  result.classList.add("show");
+
+  result.scrollIntoView({
+    behavior: "smooth"
+  });
+
+}
+
+
+/*
+ * Construit un aperçu HTML
+ */
+
+function buildPreview(files) {
+
+  let html =
+    files["index.html"];
+
+  if (!html) {
+    return "";
+  }
+
+  if (
+    files["style.css"] &&
+    !html.includes(
+      "style.css"
+    )
+  ) {
+
+    html =
+      html.replace(
+        "</head>",
+        "<style>" +
+        files["style.css"] +
+        "</style></head>"
+      );
+
+  }
+
+  if (
+    files["script.js"] &&
+    !html.includes(
+      "script.js"
+    )
+  ) {
+
+    html =
+      html.replace(
+        "</body>",
+        "<script>" +
+        files["script.js"] +
+        "<\/script></body>"
+      );
+
+  }
+
+  return html;
+
+}
+
+
+/*
+ * Téléchargement ZIP
+ */
+
+downloadButton.addEventListener(
+  "click",
+  async () => {
+
+    if (!currentProject) {
+
+      showError(
+        "Aucun projet à télécharger."
+      );
+
+      return;
+    }
+
+    downloadButton.disabled =
+      true;
+
+    downloadButton.textContent =
+      "⏳ Création du ZIP...";
+
+    try {
+
+      const response =
+        await fetch(
+          API + "/api/download",
+          {
+            method: "POST",
+
+            headers: {
+              "Content-Type":
+                "application/json"
+            },
+
+            body: JSON.stringify({
+              project:
+                currentProject
+            })
+          }
+        );
+
+      if (!response.ok) {
+
+        let message =
+          "Impossible de créer le ZIP.";
 
         try {
 
-            const response =
-                await fetch(
-                    "/api/generate-project",
-                    {
-                        method: "POST",
+          const data =
+            await response.json();
 
-                        headers: {
-                            "Content-Type":
-                                "application/json"
-                        },
+          message =
+            data.error ||
+            message;
 
-                        body: JSON.stringify({
-                            prompt: prompt
-                        })
-                    }
-                );
+        } catch {}
 
+        throw new Error(
+          message
+        );
 
-            const data =
-                await response.json();
+      }
 
+      const blob =
+        await response.blob();
 
-            if (!response.ok) {
+      const url =
+        URL.createObjectURL(
+          blob
+        );
 
-                throw new Error(
-                    data.error ||
-                    "Erreur du serveur."
-                );
+      const link =
+        document.createElement("a");
 
-            }
+      link.href = url;
 
+      link.download =
+        (
+          currentProject.projectName ||
+          "onescript-project"
+        )
+        .replace(
+          /[^a-zA-Z0-9-_]/g,
+          "-"
+        )
+        .toLowerCase()
+        + ".zip";
 
-            projectName.textContent =
-                "📦 " +
-                data.projectName;
+      document.body.appendChild(
+        link
+      );
 
+      link.click();
 
-            projectDescription.textContent =
-                data.description || "";
+      link.remove();
 
+      URL.revokeObjectURL(
+        url
+      );
 
-            fileList.innerHTML = "";
+    } catch (error) {
 
+      showError(
+        error.message
+      );
 
-            for (const file of data.files) {
+    } finally {
 
-                const div =
-                    document.createElement("div");
+      downloadButton.disabled =
+        false;
 
-                div.className =
-                    "file";
-
-                div.textContent =
-                    "📄 " + file.path;
-
-                fileList.appendChild(div);
-
-            }
-
-
-            download.href =
-                data.zipUrl;
-
-            download.style.display =
-                "inline-block";
-
-
-            resultCard.style.display =
-                "block";
-
-
-        } catch (error) {
-
-            errorBox.textContent =
-                "❌ " + error.message;
-
-            errorBox.style.display =
-                "block";
-
-        }
-
-
-        generateButton.disabled = false;
-
-        generateButton.textContent =
-            "⚡ Créer le projet";
-
-        loading.style.display =
-            "none";
+      downloadButton.textContent =
+        "📦 Télécharger le ZIP";
 
     }
+
+  }
 );
 
 
+/*
+ * Ctrl + Entrée pour générer
+ */
 
-clearButton.addEventListener(
-    "click",
-    () => {
+promptInput.addEventListener(
+  "keydown",
+  event => {
 
-        promptInput.value = "";
+    if (
+      event.ctrlKey &&
+      event.key === "Enter"
+    ) {
 
-        errorBox.style.display =
-            "none";
-
-        resultCard.style.display =
-            "none";
-
-        fileList.innerHTML = "";
+      generateButton.click();
 
     }
+
+  }
 );
 
 </script>
 
-
 </body>
-
 </html>
