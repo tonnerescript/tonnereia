@@ -1,6 +1,6 @@
 import JSZip from "jszip";
 
-const AI_MODEL = "@cf/meta/llama-3.1-8b-instruct-fast";
+const GEMINI_MODEL = "gemini-2.5-flash";
 
 const SYSTEM_PROMPT = `
 Tu es TonnerreIA Design Director, une IA spécialisée dans la conception de sites web premium.
@@ -371,7 +371,7 @@ contenu complet
 END_FILE
 
 Aucun markdown.
-Aucun bloc \`\`\`.
+Aucun bloc de code.
 Aucune explication.
 `;
 
@@ -469,21 +469,6 @@ function parseProject(text) {
 
   const files = {};
 
-  /*
-   * OneScript AI peut générer différents types
-   * de fichiers et des dossiers.
-   *
-   * Exemples :
-   * index.html
-   * style.css
-   * script.js
-   * package.json
-   * src/App.jsx
-   * commands/ticket.js
-   * database/schema.sql
-   * main.py
-   */
-
   const regex =
     /FILE:\s*(\S+)\s*\n([\s\S]*?)\s*END_FILE/gi;
 
@@ -497,9 +482,6 @@ function parseProject(text) {
       continue;
     }
 
-    /*
-     * Empêche les chemins dangereux.
-     */
     if (
       filename.includes("..") ||
       filename.startsWith("/") ||
@@ -605,40 +587,102 @@ ${js}
   return index;
 }
 
+/*
+==================================================
+GEMINI API
+==================================================
+*/
+
 async function callAI(env, messages, options = {}) {
-  if (!env.AI) {
+  if (!env.GEMINI_API_KEY) {
     throw new Error(
-      "Le binding Workers AI 'AI' est absent."
+      "GEMINI_API_KEY manquante dans Cloudflare."
     );
   }
 
-  const result = await env.AI.run(
-    AI_MODEL,
-    {
-      messages,
-      max_tokens:
+  const systemMessage = messages.find(
+    message => message.role === "system"
+  );
+
+  const contents = messages
+    .filter(message => message.role !== "system")
+    .map(message => ({
+      role:
+        message.role === "assistant"
+          ? "model"
+          : "user",
+      parts: [
+        {
+          text: String(
+            message.content || ""
+          )
+        }
+      ]
+    }));
+
+  if (contents.length === 0) {
+    contents.push({
+      role: "user",
+      parts: [
+        {
+          text: "Commence la tâche."
+        }
+      ]
+    });
+  }
+
+  const body = {
+    contents,
+    generationConfig: {
+      maxOutputTokens:
         options.max_tokens || 12000,
       temperature:
-        options.temperature ?? 0.9
+        options.temperature ?? 0.7
+    }
+  };
+
+  if (systemMessage) {
+    body.systemInstruction = {
+      parts: [
+        {
+          text: String(
+            systemMessage.content || ""
+          )
+        }
+      ]
+    };
+  }
+
+  const response = await fetch(
+    `https://generativelanguage.googleapis.com/v1beta/models/${GEMINI_MODEL}:generateContent`,
+    {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "x-goog-api-key":
+          env.GEMINI_API_KEY
+      },
+      body: JSON.stringify(body)
     }
   );
 
-  let output = "";
+  const data = await response.json();
 
-  if (typeof result === "string") {
-    output = result;
-  } else if (result?.response) {
-    output = result.response;
-  } else if (result?.text) {
-    output = result.text;
-  } else if (result?.choices?.[0]?.message?.content) {
-    output =
-      result.choices[0].message.content;
+  if (!response.ok) {
+    throw new Error(
+      data?.error?.message ||
+      `Gemini HTTP ${response.status}`
+    );
   }
+
+  const output =
+    data?.candidates?.[0]?.content?.parts
+      ?.map(part => part.text || "")
+      .join("") || "";
 
   if (!output) {
     throw new Error(
-      "Workers AI n'a retourné aucun contenu."
+      "Gemini n'a retourné aucun contenu."
     );
   }
 
@@ -791,13 +835,14 @@ ${SYSTEM_PROMPT}
   };
 }
 
-
 async function generateProject(
   env,
   prompt,
   projectType = "auto"
 ) {
-  const type = String(projectType || "auto").trim();
+  const type = String(
+    projectType || "auto"
+  ).trim();
 
   const projectPrompt = `
 TU ES ONESCRIPT AI.
@@ -939,9 +984,13 @@ IMPORTANT :
     }
   );
 
-  const files = parseProject(response);
+  const files = parseProject(
+    response
+  );
 
-  if (Object.keys(files).length === 0) {
+  if (
+    Object.keys(files).length === 0
+  ) {
     throw new Error(
       "OneScript AI n'a généré aucun fichier valide."
     );
@@ -964,12 +1013,13 @@ async function editSite(
   const files =
     project?.files || {};
 
-  const projectText = Object.entries(files)
-    .map(
-      ([filename, content]) =>
-        `FILE: ${filename}\n${content}\nEND_FILE`
-    )
-    .join("\n\n");
+  const projectText =
+    Object.entries(files)
+      .map(
+        ([filename, content]) =>
+          `FILE: ${filename}\n${content}\nEND_FILE`
+      )
+      .join("\n\n");
 
   const imageInfo = images.length
     ? `
@@ -1048,40 +1098,64 @@ Retourne tous les fichiers nécessaires.
 }
 
 async function downloadProject(project) {
-  if (!project || !project.files) {
-    throw new Error("Projet absent ou invalide.");
+  if (
+    !project ||
+    !project.files
+  ) {
+    throw new Error(
+      "Projet absent ou invalide."
+    );
   }
 
   const zip = new JSZip();
 
-  const files = project.files;
-
-  for (const [filename, content] of Object.entries(files)) {
-    if (!filename || typeof content !== "string") {
+  for (
+    const [filename, content]
+    of Object.entries(project.files)
+  ) {
+    if (
+      !filename ||
+      typeof content !== "string"
+    ) {
       continue;
     }
 
-    zip.file(filename, content);
+    zip.file(
+      filename,
+      content
+    );
   }
 
   const projectName =
-    String(project.projectName || "tonnerreia-project")
-      .replace(/[^a-zA-Z0-9-_]/g, "-")
+    String(
+      project.projectName ||
+      "onescript-ai-project"
+    )
+      .replace(
+        /[^a-zA-Z0-9-_]/g,
+        "-"
+      )
       .toLowerCase();
 
-  const blob = await zip.generateAsync({
-    type: "blob"
-  });
+  const blob =
+    await zip.generateAsync({
+      type: "blob"
+    });
 
-  return new Response(blob, {
-    status: 200,
-    headers: {
-      "content-type": "application/zip",
-      "content-disposition":
-        `attachment; filename="${projectName}.zip"`
+  return new Response(
+    blob,
+    {
+      status: 200,
+      headers: {
+        "content-type":
+          "application/zip",
+        "content-disposition":
+          `attachment; filename="${projectName}.zip"`
+      }
     }
-  });
+  );
 }
+
 const APP = `<!DOCTYPE html>
 <html lang="fr">
 <head>
@@ -1471,7 +1545,7 @@ button {
   </div>
 
   <div class="status" id="status">
-    Design Director
+    Gemini Design Director
   </div>
 </header>
 
@@ -1670,6 +1744,7 @@ const editButton =
 
 const editInput =
   document.getElementById("editInput");
+
 const downloadButton =
   document.getElementById("download");
 
@@ -1701,11 +1776,15 @@ function setLoading(value, text) {
   );
 
   if (text) {
-    loadingText.textContent = text;
+    loadingText.textContent =
+      text;
   }
 }
 
-function resizeImage(file, maxSize = 1600) {
+function resizeImage(
+  file,
+  maxSize = 1600
+) {
   return new Promise(
     (resolve, reject) => {
 
@@ -1854,7 +1933,6 @@ photoInput.addEventListener(
         console.error(
           error
         );
-
       }
     }
   }
@@ -1884,7 +1962,8 @@ function showProject(project) {
 
   downloadButton.disabled =
     false;
-filesElement.innerHTML =
+
+  filesElement.innerHTML =
     "";
 
   Object.keys(
@@ -1928,7 +2007,7 @@ generateButton.addEventListener(
 
     setLoading(
       true,
-      "TonnerreIA imagine la direction artistique..."
+      "Gemini imagine la direction artistique..."
     );
 
     try {
@@ -2002,7 +2081,7 @@ editButton.addEventListener(
 
     setLoading(
       true,
-      "TonnerreIA redesign ton site..."
+      "Gemini redesign ton site..."
     );
 
     try {
@@ -2058,7 +2137,6 @@ editButton.addEventListener(
     }
   }
 );
-
 
 downloadButton.addEventListener(
   "click",
@@ -2210,8 +2288,10 @@ promptInput.addEventListener(
 
     if (
       event.key === "Enter" &&
-      (event.ctrlKey ||
-       event.metaKey)
+      (
+        event.ctrlKey ||
+        event.metaKey
+      )
     ) {
 
       generateButton.click();
@@ -2256,9 +2336,11 @@ export default {
         return json({
           ok: true,
           cloudflare: true,
-          workersAI: Boolean(env.AI),
-          model: AI_MODEL,
-          version: "V8-CLEAN"
+          gemini: Boolean(
+            env.GEMINI_API_KEY
+          ),
+          model: GEMINI_MODEL,
+          version: "V9-GEMINI"
         });
       }
 
@@ -2266,6 +2348,7 @@ export default {
         request.method === "POST" &&
         url.pathname === "/api/project"
       ) {
+
         const body =
           await request.json();
 
@@ -2283,7 +2366,8 @@ export default {
           return json(
             {
               ok: false,
-              error: "Prompt vide."
+              error:
+                "Prompt vide."
             },
             400
           );
@@ -2433,6 +2517,19 @@ export default {
         return await downloadProject(
           body.project
         );
+      }
+
+      /*
+      Route principale de l'application.
+      */
+      if (
+        request.method === "GET" &&
+        (
+          url.pathname === "/" ||
+          url.pathname === "/index.html"
+        )
+      ) {
+        return html(APP);
       }
 
       return json(
