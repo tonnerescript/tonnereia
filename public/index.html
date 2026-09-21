@@ -1,176 +1,181 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
+
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1.0"
+  >
 
   <title>OneScript AI</title>
 
   <style>
+
     * {
       box-sizing: border-box;
-      margin: 0;
-      padding: 0;
     }
 
     body {
-      font-family: Arial, sans-serif;
-      background: #07070b;
-      color: #fff;
+      margin: 0;
       min-height: 100vh;
+      font-family: Arial, Helvetica, sans-serif;
+      background: #09090d;
+      color: #ffffff;
     }
 
     header {
-      height: 70px;
-      border-bottom: 1px solid #202027;
+      padding: 22px;
+      border-bottom: 1px solid #252531;
+      background: #0d0d13;
+    }
+
+    .header-inner {
+      max-width: 1100px;
+      margin: auto;
       display: flex;
       align-items: center;
       justify-content: space-between;
-      padding: 0 25px;
-      background: #0b0b10;
+      gap: 15px;
     }
 
     .logo {
-      font-size: 22px;
-      font-weight: bold;
-    }
-
-    .logo span {
-      color: #8b5cf6;
+      font-size: 24px;
+      font-weight: 800;
     }
 
     .status {
-      font-size: 13px;
-      color: #8aff9b;
       display: flex;
       align-items: center;
-      gap: 7px;
+      gap: 8px;
+      color: #9ca3af;
+      font-size: 14px;
     }
 
-    .dot {
-      width: 8px;
-      height: 8px;
-      background: #45ff65;
+    .status-dot {
+      width: 9px;
+      height: 9px;
       border-radius: 50%;
+      background: #22c55e;
     }
 
     main {
+      width: 100%;
       max-width: 1100px;
       margin: auto;
-      padding: 55px 20px;
+      padding: 35px 18px 60px;
     }
 
     .hero {
       text-align: center;
-      margin-bottom: 40px;
+      margin-bottom: 30px;
     }
 
     .hero h1 {
-      font-size: clamp(38px, 7vw, 70px);
-      line-height: 1;
-      margin-bottom: 18px;
-    }
-
-    .hero h1 span {
-      color: #8b5cf6;
+      margin: 0 0 10px;
+      font-size: 42px;
     }
 
     .hero p {
-      color: #9999a8;
-      max-width: 650px;
-      margin: auto;
-      line-height: 1.6;
+      margin: 0;
+      color: #9ca3af;
+      font-size: 17px;
     }
 
-    .generator {
-      background: #101017;
-      border: 1px solid #24242f;
-      border-radius: 20px;
-      padding: 22px;
-      box-shadow: 0 20px 60px rgba(0,0,0,.35);
+    .panel {
+      background: #111118;
+      border: 1px solid #272733;
+      border-radius: 18px;
+      padding: 20px;
+      margin-bottom: 22px;
     }
 
     textarea {
       width: 100%;
-      min-height: 180px;
+      min-height: 150px;
       resize: vertical;
-      background: #08080d;
-      color: white;
-      border: 1px solid #292936;
+      padding: 16px;
       border-radius: 14px;
-      padding: 18px;
-      font-size: 16px;
+      border: 1px solid #30303d;
+      background: #09090d;
+      color: white;
       outline: none;
+      font-size: 16px;
+      font-family: inherit;
     }
 
     textarea:focus {
-      border-color: #8b5cf6;
+      border-color: #7c3aed;
     }
 
-    .options {
+    .types {
       display: flex;
       flex-wrap: wrap;
-      gap: 10px;
-      margin: 15px 0;
+      gap: 9px;
+      margin-top: 15px;
     }
 
-    .type {
-      background: #171720;
-      border: 1px solid #2c2c38;
-      color: #bbb;
+    .type-button {
+      border: 1px solid #30303d;
+      background: #16161f;
+      color: #ddd;
       padding: 10px 14px;
       border-radius: 10px;
       cursor: pointer;
     }
 
-    .type.active {
-      background: #8b5cf6;
+    .type-button:hover {
+      border-color: #7c3aed;
+    }
+
+    .type-button.active {
+      background: #7c3aed;
+      border-color: #7c3aed;
       color: white;
-      border-color: #8b5cf6;
     }
 
-    button {
-      border: none;
-      cursor: pointer;
-      font-weight: bold;
-    }
-
-    #generate {
+    .primary-button {
       width: 100%;
-      padding: 16px;
+      margin-top: 18px;
+      padding: 15px;
+      border: 0;
       border-radius: 12px;
-      background: #8b5cf6;
+      background: #7c3aed;
       color: white;
       font-size: 16px;
+      font-weight: bold;
+      cursor: pointer;
     }
 
-    #generate:hover {
-      background: #7c3aed;
+    .primary-button:hover {
+      background: #6d28d9;
     }
 
-    #generate:disabled {
-      opacity: .5;
+    button:disabled {
+      opacity: 0.55;
       cursor: not-allowed;
     }
 
     .loading {
       display: none;
       text-align: center;
-      padding: 25px;
-      color: #aaa;
+      padding: 20px;
+      color: #a78bfa;
     }
 
-    .loading.show {
-      display: block;
+    .error {
+      display: none;
+      padding: 14px;
+      margin-bottom: 20px;
+      border-radius: 12px;
+      background: #3b1118;
+      border: 1px solid #7f1d1d;
+      color: #fecaca;
     }
 
     .result {
       display: none;
-      margin-top: 25px;
-    }
-
-    .result.show {
-      display: block;
     }
 
     .result-header {
@@ -182,425 +187,518 @@
       flex-wrap: wrap;
     }
 
-    .project-name {
-      font-size: 23px;
-      font-weight: bold;
+    .result-header h2 {
+      margin: 0;
     }
 
-    .download {
-      background: #22c55e;
-      color: #07100a;
-      padding: 12px 17px;
+    .project-name {
+      color: #a78bfa;
+      margin-top: 5px;
+    }
+
+    .download-button {
+      padding: 12px 16px;
+      border: 0;
       border-radius: 10px;
+      background: #22c55e;
+      color: #061006;
+      font-weight: bold;
+      cursor: pointer;
     }
 
     .files {
       display: grid;
       gap: 8px;
+      margin-bottom: 22px;
     }
 
     .file {
-      background: #0b0b11;
-      border: 1px solid #24242f;
+      padding: 12px 14px;
+      background: #0b0b10;
+      border: 1px solid #262632;
       border-radius: 10px;
-      padding: 13px 15px;
       font-family: monospace;
-      color: #c8b5ff;
+      color: #d4d4d8;
+      word-break: break-all;
     }
 
     .preview {
-      margin-top: 20px;
+      border: 1px solid #292934;
+      border-radius: 14px;
+      overflow: hidden;
+      background: white;
     }
 
     .preview iframe {
       width: 100%;
-      height: 500px;
-      border: 1px solid #292936;
-      border-radius: 14px;
+      height: 600px;
+      border: 0;
       background: white;
     }
 
-    .error {
-      display: none;
-      margin-top: 15px;
-      padding: 15px;
-      background: #301217;
-      border: 1px solid #68202b;
-      color: #ff9da9;
-      border-radius: 10px;
+    .edit-section {
+      margin-top: 24px;
+      padding: 20px;
+      border: 1px solid #29293a;
+      border-radius: 16px;
+      background: #111119;
     }
 
-    .error.show {
-      display: block;
+    .edit-section h3 {
+      margin: 0 0 8px;
     }
 
-    @media (max-width: 600px) {
-      header {
-        padding: 0 15px;
+    .edit-section p {
+      margin: 0 0 14px;
+      color: #999;
+    }
+
+    .edit-section textarea {
+      min-height: 110px;
+    }
+
+    .edit-button {
+      width: 100%;
+      margin-top: 12px;
+      padding: 14px;
+      border: 0;
+      border-radius: 12px;
+      background: #7c3aed;
+      color: white;
+      font-size: 16px;
+      font-weight: bold;
+      cursor: pointer;
+    }
+
+    .edit-button:hover {
+      background: #6d28d9;
+    }
+
+    footer {
+      text-align: center;
+      color: #666;
+      padding: 25px;
+      font-size: 13px;
+    }
+
+    @media (max-width: 700px) {
+
+      .hero h1 {
+        font-size: 32px;
       }
 
       main {
-        padding: 35px 12px;
+        padding: 25px 12px 45px;
       }
 
-      .generator {
-        padding: 14px;
+      .panel {
+        padding: 15px;
       }
 
       .preview iframe {
-        height: 400px;
+        height: 450px;
       }
+
     }
+
   </style>
+
 </head>
 
 <body>
 
 <header>
-  <div class="logo">
-    One<span>Script</span> AI
+
+  <div class="header-inner">
+
+    <div class="logo">
+      ⚡ OneScript AI
+    </div>
+
+    <div class="status">
+      <span class="status-dot"></span>
+      <span id="statusText">
+        AI en ligne
+      </span>
+    </div>
+
   </div>
 
-  <div class="status">
-    <span class="dot"></span>
-    AI en ligne
-  </div>
 </header>
+
 
 <main>
 
   <section class="hero">
+
     <h1>
-      Crée n'importe quel<br>
-      <span>projet avec l'IA.</span>
+      Crée n'importe quel projet
     </h1>
 
     <p>
-      Décris simplement ce que tu veux créer.
-      OneScript AI génère automatiquement la structure,
-      les fichiers et le code de ton projet.
+      Décris ton projet et OneScript AI génère les fichiers automatiquement.
     </p>
+
   </section>
 
-  <section class="generator">
+
+  <div
+    id="error"
+    class="error"
+  ></div>
+
+
+  <section class="panel">
 
     <textarea
       id="prompt"
-      placeholder="Exemple : Crée un bot Discord complet avec tickets, modération, logs et commandes slash..."
+      placeholder="Exemple : crée un bot Discord JavaScript avec /ping, /help et un système de tickets..."
     ></textarea>
 
-    <div class="options">
 
-      <button class="type active" data-type="auto">
-        ✨ Auto
+    <div class="types">
+
+      <button
+        class="type-button active"
+        data-type="auto"
+      >
+        Auto
       </button>
 
-      <button class="type" data-type="website">
+      <button
+        class="type-button"
+        data-type="website"
+      >
         🌐 Site Web
       </button>
 
-      <button class="type" data-type="discord-bot">
+      <button
+        class="type-button"
+        data-type="discord"
+      >
         🤖 Bot Discord
       </button>
 
-      <button class="type" data-type="python">
+      <button
+        class="type-button"
+        data-type="python"
+      >
         🐍 Python
       </button>
 
-      <button class="type" data-type="javascript">
+      <button
+        class="type-button"
+        data-type="javascript"
+      >
         🟨 JavaScript
       </button>
 
-      <button class="type" data-type="typescript">
+      <button
+        class="type-button"
+        data-type="typescript"
+      >
         🔷 TypeScript
       </button>
 
-      <button class="type" data-type="react">
+      <button
+        class="type-button"
+        data-type="react"
+      >
         ⚛️ React
       </button>
 
-      <button class="type" data-type="godot">
+      <button
+        class="type-button"
+        data-type="godot"
+      >
         🎮 Godot
+      </button>
+
+      <button
+        class="type-button"
+        data-type="unity"
+      >
+        🕹️ Unity
+      </button>
+
+      <button
+        class="type-button"
+        data-type="api"
+      >
+        🔌 API
+      </button>
+
+      <button
+        class="type-button"
+        data-type="node"
+      >
+        🟢 Node.js
       </button>
 
     </div>
 
-    <button id="generate">
+
+    <button
+      id="generateButton"
+      class="primary-button"
+    >
       ⚡ Générer le projet
     </button>
 
-    <div class="loading" id="loading">
-      🧠 OneScript AI génère ton projet...
-    </div>
+  </section>
 
-    <div class="error" id="error"></div>
 
-    <section class="result" id="result">
+  <div
+    id="loading"
+    class="loading"
+  >
+    ⏳ OneScript AI génère ton projet...
+  </div>
+
+
+  <section
+    id="result"
+    class="result"
+  >
+
+    <div class="panel">
 
       <div class="result-header">
 
         <div>
-          <div class="project-name" id="projectName">
-            Projet
-          </div>
 
-          <div style="color:#888;margin-top:5px" id="projectType">
-            Type : auto
-          </div>
+          <h2>
+            ✅ Projet généré
+          </h2>
+
+          <div
+            id="projectName"
+            class="project-name"
+          ></div>
+
         </div>
 
-        <button class="download" id="download">
+        <button
+          id="downloadButton"
+          class="download-button"
+        >
           📦 Télécharger le ZIP
         </button>
 
       </div>
 
-      <div class="files" id="files"></div>
 
-      <div class="preview" id="previewContainer">
+      <h3>
+        📁 Fichiers
+      </h3>
+
+      <div
+        id="files"
+        class="files"
+      ></div>
+
+
+      <div
+        id="previewContainer"
+        style="display:none;"
+      >
+
+        <h3>
+          👀 Aperçu
+        </h3>
+
+        <div class="preview">
+
+          <iframe
+            id="preview"
+            sandbox="allow-scripts"
+          ></iframe>
+
+        </div>
+
       </div>
 
-    </section>
+
+      <div class="edit-section">
+
+        <h3>
+          ✏️ Modifier le projet
+        </h3>
+
+        <p>
+          Demande une modification à OneScript AI.
+        </p>
+
+        <textarea
+          id="editPrompt"
+          placeholder="Exemple : ajoute une page Contact avec un formulaire et un bouton Retour..."
+        ></textarea>
+
+        <button
+          id="editButton"
+          class="edit-button"
+        >
+          ✏️ Appliquer la modification
+        </button>
+
+      </div>
+
+    </div>
 
   </section>
 
 </main>
 
+
+<footer>
+  OneScript AI — Génération de projets avec Cloudflare Workers AI
+</footer>
+
+
 <script>
+
+"use strict";
+
 
 const API = "";
 
-let selectedType = "auto";
+
+let currentType = "auto";
+
 let currentProject = null;
 
+
 const promptInput =
-  document.getElementById("prompt");
+  document.getElementById(
+    "prompt"
+  );
+
 
 const generateButton =
-  document.getElementById("generate");
+  document.getElementById(
+    "generateButton"
+  );
 
-const loading =
-  document.getElementById("loading");
-
-const result =
-  document.getElementById("result");
-
-const errorBox =
-  document.getElementById("error");
-
-const projectName =
-  document.getElementById("projectName");
-
-const projectType =
-  document.getElementById("projectType");
-
-const filesContainer =
-  document.getElementById("files");
-
-const previewContainer =
-  document.getElementById("previewContainer");
 
 const downloadButton =
-  document.getElementById("download");
+  document.getElementById(
+    "downloadButton"
+  );
+
+
+const editButton =
+  document.getElementById(
+    "editButton"
+  );
+
+
+const editPrompt =
+  document.getElementById(
+    "editPrompt"
+  );
+
+
+const loading =
+  document.getElementById(
+    "loading"
+  );
+
+
+const errorElement =
+  document.getElementById(
+    "error"
+  );
+
+
+const result =
+  document.getElementById(
+    "result"
+  );
+
+
+const projectName =
+  document.getElementById(
+    "projectName"
+  );
+
+
+const filesElement =
+  document.getElementById(
+    "files"
+  );
+
+
+const previewContainer =
+  document.getElementById(
+    "previewContainer"
+  );
+
+
+const preview =
+  document.getElementById(
+    "preview"
+  );
 
 
 /*
- * Sélection du type de projet
+ * Sélection du type
  */
 
-document.querySelectorAll(".type").forEach(button => {
+const typeButtons =
+  document.querySelectorAll(
+    ".type-button"
+  );
 
-  button.addEventListener("click", () => {
 
-    document
-      .querySelectorAll(".type")
-      .forEach(b => b.classList.remove("active"));
+typeButtons.forEach(
+  button => {
 
-    button.classList.add("active");
+    button.addEventListener(
+      "click",
+      () => {
 
-    selectedType =
-      button.dataset.type;
+        typeButtons.forEach(
+          item => {
 
-  });
+            item.classList.remove(
+              "active"
+            );
 
-});
+          }
+        );
+
+        button.classList.add(
+          "active"
+        );
+
+        currentType =
+          button.dataset.type ||
+          "auto";
+
+      }
+    );
+
+  }
+);
 
 
 /*
  * Afficher une erreur
  */
 
-function showError(message) {
+function showError(
+  message
+) {
 
-  errorBox.textContent =
-    message || "Une erreur est survenue.";
+  errorElement.textContent =
+    message ||
+    "Une erreur est survenue.";
 
-  errorBox.classList.add("show");
+  errorElement.style.display =
+    "block";
 
-}
-
-
-/*
- * Génération du projet
- */
-
-generateButton.addEventListener("click", async () => {
-
-  const prompt =
-    promptInput.value.trim();
-
-  if (!prompt) {
-
-    showError(
-      "Décris d'abord le projet que tu veux créer."
-    );
-
-    return;
-  }
-
-  errorBox.classList.remove("show");
-
-  result.classList.remove("show");
-
-  previewContainer.innerHTML = "";
-
-  filesContainer.innerHTML = "";
-
-  loading.classList.add("show");
-
-  generateButton.disabled = true;
-
-  try {
-
-    const response =
-      await fetch(
-        API + "/api/project",
-        {
-          method: "POST",
-
-          headers: {
-            "Content-Type":
-              "application/json"
-          },
-
-          body: JSON.stringify({
-            prompt,
-            type: selectedType
-          })
-        }
-      );
-
-    const data =
-      await response.json();
-
-    if (!response.ok || !data.ok) {
-
-      throw new Error(
-        data.error ||
-        "La génération a échoué."
-      );
-
-    }
-
-    currentProject =
-      data.project;
-
-    displayProject(
-      currentProject
-    );
-
-  } catch (error) {
-
-    showError(
-      error.message
-    );
-
-  } finally {
-
-    loading.classList.remove("show");
-
-    generateButton.disabled = false;
-
-  }
-
-});
-
-
-/*
- * Affichage du projet
- */
-
-function displayProject(project) {
-
-  projectName.textContent =
-    project.projectName ||
-    "Projet OneScript";
-
-  projectType.textContent =
-    "Type : " +
-    (project.type || "auto");
-
-  filesContainer.innerHTML = "";
-
-  const files =
-    project.files || {};
-
-  Object.keys(files)
-    .sort()
-    .forEach(filename => {
-
-      const div =
-        document.createElement("div");
-
-      div.className =
-        "file";
-
-      div.textContent =
-        "📄 " + filename;
-
-      filesContainer.appendChild(div);
-
-    });
-
-  /*
-   * Aperçu automatique pour un site HTML
-   */
-
-  const htmlFile =
-    Object.keys(files).find(
-      name =>
-        name.toLowerCase() ===
-        "index.html"
-    );
-
-  if (
-    htmlFile &&
-    files[htmlFile]
-  ) {
-
-    const iframe =
-      document.createElement("iframe");
-
-    iframe.setAttribute(
-      "sandbox",
-      "allow-scripts"
-    );
-
-    iframe.srcdoc =
-      buildPreview(files);
-
-    previewContainer.innerHTML =
-      "<h3 style='margin-bottom:12px'>👁️ Aperçu</h3>";
-
-    previewContainer.appendChild(
-      iframe
-    );
-
-  }
-
-  result.classList.add("show");
-
-  result.scrollIntoView({
+  window.scrollTo({
+    top: 0,
     behavior: "smooth"
   });
 
@@ -608,17 +706,54 @@ function displayProject(project) {
 
 
 /*
- * Construit un aperçu HTML
+ * Cacher l'erreur
  */
 
-function buildPreview(files) {
+function clearError() {
+
+  errorElement.textContent =
+    "";
+
+  errorElement.style.display =
+    "none";
+
+}
+
+
+/*
+ * Construire l'aperçu HTML
+ */
+
+function makePreview(
+  project
+) {
+
+  if (
+    !project ||
+    !project.files
+  ) {
+
+    return null;
+
+  }
+
+
+  const files =
+    project.files;
+
 
   let html =
-    files["index.html"];
+    files["index.html"] ||
+    files["public/index.html"] ||
+    files["src/index.html"];
+
 
   if (!html) {
-    return "";
+
+    return null;
+
   }
+
 
   if (
     files["style.css"] &&
@@ -637,6 +772,7 @@ function buildPreview(files) {
 
   }
 
+
   if (
     files["script.js"] &&
     !html.includes(
@@ -654,18 +790,270 @@ function buildPreview(files) {
 
   }
 
+
   return html;
 
 }
 
 
 /*
- * Téléchargement ZIP
+ * Actualiser l'interface du projet
+ */
+
+function renderProject(
+  project
+) {
+
+  if (
+    !project
+  ) {
+
+    return;
+
+  }
+
+
+  currentProject =
+    project;
+
+
+  projectName.textContent =
+    project.projectName ||
+    "OneScript AI Project";
+
+
+  filesElement.innerHTML =
+    "";
+
+
+  const projectFiles =
+    project.files ||
+    {};
+
+
+  const filenames =
+    Object.keys(
+      projectFiles
+    );
+
+
+  if (
+    filenames.length === 0
+  ) {
+
+    const empty =
+      document.createElement(
+        "div"
+      );
+
+    empty.className =
+      "file";
+
+    empty.textContent =
+      "Aucun fichier généré.";
+
+    filesElement.appendChild(
+      empty
+    );
+
+  } else {
+
+    filenames.forEach(
+      filename => {
+
+        const element =
+          document.createElement(
+            "div"
+          );
+
+        element.className =
+          "file";
+
+        element.textContent =
+          "📄 " +
+          filename;
+
+        filesElement.appendChild(
+          element
+        );
+
+      }
+    );
+
+  }
+
+
+  const html =
+    makePreview(
+      project
+    );
+
+
+  if (html) {
+
+    previewContainer.style.display =
+      "block";
+
+    preview.srcdoc =
+      html;
+
+  } else {
+
+    previewContainer.style.display =
+      "none";
+
+    preview.srcdoc =
+      "";
+
+  }
+
+
+  result.style.display =
+    "block";
+
+
+  result.scrollIntoView({
+    behavior: "smooth",
+    block: "start"
+  });
+
+}
+
+
+/*
+ * Génération du projet
+ */
+
+generateButton.addEventListener(
+  "click",
+  async () => {
+
+    clearError();
+
+
+    const prompt =
+      promptInput.value.trim();
+
+
+    if (!prompt) {
+
+      showError(
+        "Décris d'abord le projet que tu veux créer."
+      );
+
+      return;
+
+    }
+
+
+    generateButton.disabled =
+      true;
+
+    loading.style.display =
+      "block";
+
+    result.style.display =
+      "none";
+
+
+    try {
+
+      const response =
+        await fetch(
+          API + "/api/project",
+          {
+            method: "POST",
+
+            headers: {
+              "Content-Type":
+                "application/json"
+            },
+
+            body:
+              JSON.stringify({
+                prompt:
+                  prompt,
+
+                type:
+                  currentType
+              })
+          }
+        );
+
+
+      let data = null;
+
+
+      try {
+
+        data =
+          await response.json();
+
+      } catch {
+
+        throw new Error(
+          "Réponse invalide du serveur."
+        );
+
+      }
+
+
+      if (!response.ok) {
+
+        throw new Error(
+          data.error ||
+          "Impossible de générer le projet."
+        );
+
+      }
+
+
+      if (
+        !data.project
+      ) {
+
+        throw new Error(
+          "Le serveur n'a pas retourné de projet."
+        );
+
+      }
+
+
+      renderProject(
+        data.project
+      );
+
+    } catch (error) {
+
+      showError(
+        error.message ||
+        "Erreur pendant la génération."
+      );
+
+    } finally {
+
+      generateButton.disabled =
+        false;
+
+      loading.style.display =
+        "none";
+
+    }
+
+  }
+);
+
+
+/*
+ * Télécharger le ZIP
  */
 
 downloadButton.addEventListener(
   "click",
   async () => {
+
+    clearError();
+
 
     if (!currentProject) {
 
@@ -674,13 +1062,16 @@ downloadButton.addEventListener(
       );
 
       return;
+
     }
+
 
     downloadButton.disabled =
       true;
 
     downloadButton.textContent =
       "⏳ Création du ZIP...";
+
 
     try {
 
@@ -695,17 +1086,20 @@ downloadButton.addEventListener(
                 "application/json"
             },
 
-            body: JSON.stringify({
-              project:
-                currentProject
-            })
+            body:
+              JSON.stringify({
+                project:
+                  currentProject
+              })
           }
         );
+
 
       if (!response.ok) {
 
         let message =
           "Impossible de créer le ZIP.";
+
 
         try {
 
@@ -718,24 +1112,33 @@ downloadButton.addEventListener(
 
         } catch {}
 
+
         throw new Error(
           message
         );
 
       }
 
+
       const blob =
         await response.blob();
+
 
       const url =
         URL.createObjectURL(
           blob
         );
 
-      const link =
-        document.createElement("a");
 
-      link.href = url;
+      const link =
+        document.createElement(
+          "a"
+        );
+
+
+      link.href =
+        url;
+
 
       link.download =
         (
@@ -749,13 +1152,17 @@ downloadButton.addEventListener(
         .toLowerCase()
         + ".zip";
 
+
       document.body.appendChild(
         link
       );
 
+
       link.click();
 
+
       link.remove();
+
 
       URL.revokeObjectURL(
         url
@@ -764,7 +1171,8 @@ downloadButton.addEventListener(
     } catch (error) {
 
       showError(
-        error.message
+        error.message ||
+        "Erreur pendant la création du ZIP."
       );
 
     } finally {
@@ -782,7 +1190,153 @@ downloadButton.addEventListener(
 
 
 /*
- * Ctrl + Entrée pour générer
+ * Modifier le projet
+ */
+
+editButton.addEventListener(
+  "click",
+  async () => {
+
+    clearError();
+
+
+    if (!currentProject) {
+
+      showError(
+        "Aucun projet à modifier."
+      );
+
+      return;
+
+    }
+
+
+    const change =
+      editPrompt.value.trim();
+
+
+    if (!change) {
+
+      showError(
+        "Décris la modification que tu veux faire."
+      );
+
+      return;
+
+    }
+
+
+    editButton.disabled =
+      true;
+
+    editButton.textContent =
+      "⏳ Modification en cours...";
+
+
+    try {
+
+      const response =
+        await fetch(
+          API + "/api/edit",
+          {
+            method: "POST",
+
+            headers: {
+              "Content-Type":
+                "application/json"
+            },
+
+            body:
+              JSON.stringify({
+                project:
+                  currentProject,
+
+                change:
+                  change,
+
+                images:
+                  []
+              })
+          }
+        );
+
+
+      let data = null;
+
+
+      try {
+
+        data =
+          await response.json();
+
+      } catch {
+
+        throw new Error(
+          "Réponse invalide du serveur."
+        );
+
+      }
+
+
+      if (!response.ok) {
+
+        throw new Error(
+          data.error ||
+          "Impossible de modifier le projet."
+        );
+
+      }
+
+
+      currentProject = {
+        ...currentProject,
+        ...data
+      };
+
+
+      editPrompt.value =
+        "";
+
+
+      renderProject(
+        currentProject
+      );
+
+
+      editButton.textContent =
+        "✅ Modification appliquée";
+
+
+      setTimeout(
+        () => {
+
+          editButton.textContent =
+            "✏️ Appliquer la modification";
+
+        },
+        2000
+      );
+
+    } catch (error) {
+
+      showError(
+        error.message ||
+        "Erreur pendant la modification."
+      );
+
+    } finally {
+
+      editButton.disabled =
+        false;
+
+    }
+
+  }
+);
+
+
+/*
+ * CTRL + ENTER
  */
 
 promptInput.addEventListener(
@@ -794,12 +1348,95 @@ promptInput.addEventListener(
       event.key === "Enter"
     ) {
 
+      event.preventDefault();
+
       generateButton.click();
 
     }
 
   }
 );
+
+
+/*
+ * CTRL + ENTER pour modifier
+ */
+
+editPrompt.addEventListener(
+  "keydown",
+  event => {
+
+    if (
+      event.ctrlKey &&
+      event.key === "Enter"
+    ) {
+
+      event.preventDefault();
+
+      editButton.click();
+
+    }
+
+  }
+);
+
+
+/*
+ * Vérification de l'API
+ */
+
+async function checkStatus() {
+
+  try {
+
+    const response =
+      await fetch(
+        API + "/api/status"
+      );
+
+
+    const data =
+      await response.json();
+
+
+    const statusText =
+      document.getElementById(
+        "statusText"
+      );
+
+
+    if (
+      data.ok &&
+      data.workersAI
+    ) {
+
+      statusText.textContent =
+        "AI en ligne";
+
+    } else {
+
+      statusText.textContent =
+        "AI indisponible";
+
+    }
+
+  } catch {
+
+    const statusText =
+      document.getElementById(
+        "statusText"
+      );
+
+
+    statusText.textContent =
+      "Serveur indisponible";
+
+  }
+
+}
+
+
+checkStatus();
 
 </script>
 
