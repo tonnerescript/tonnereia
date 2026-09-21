@@ -469,8 +469,23 @@ function parseProject(text) {
 
   const files = {};
 
+  /*
+   * OneScript AI peut générer différents types
+   * de fichiers et des dossiers.
+   *
+   * Exemples :
+   * index.html
+   * style.css
+   * script.js
+   * package.json
+   * src/App.jsx
+   * commands/ticket.js
+   * database/schema.sql
+   * main.py
+   */
+
   const regex =
-    /FILE:\s*([a-zA-Z0-9_.-]+\.html|style\.css|script\.js)\s*\n([\s\S]*?)\s*END_FILE/gi;
+    /FILE:\s*(\S+)\s*\n([\s\S]*?)\s*END_FILE/gi;
 
   let match;
 
@@ -478,9 +493,22 @@ function parseProject(text) {
     const filename = match[1].trim();
     const content = match[2].trim();
 
-    if (content) {
-      files[filename] = content;
+    if (!filename || !content) {
+      continue;
     }
+
+    /*
+     * Empêche les chemins dangereux.
+     */
+    if (
+      filename.includes("..") ||
+      filename.startsWith("/") ||
+      filename.startsWith("\\")
+    ) {
+      continue;
+    }
+
+    files[filename] = content;
   }
 
   return files;
@@ -493,7 +521,7 @@ function extractProjectName(text) {
 
   return match
     ? match[1].trim()
-    : "TonnerreIA Site";
+    : "OneScript AI Project";
 }
 
 function injectImages(files, images) {
@@ -760,6 +788,170 @@ ${SYSTEM_PROMPT}
     designDirection,
     files,
     preview: makePreview(files)
+  };
+}
+
+
+async function generateProject(
+  env,
+  prompt,
+  projectType = "auto"
+) {
+  const type = String(projectType || "auto").trim();
+
+  const projectPrompt = `
+TU ES ONESCRIPT AI.
+
+Tu es une IA spécialisée dans la génération de projets logiciels complets.
+
+==================================================
+DEMANDE UTILISATEUR
+==================================================
+
+${prompt}
+
+==================================================
+TYPE DE PROJET
+==================================================
+
+${type}
+
+Si le type est "auto", détermine toi-même la technologie
+la plus adaptée à la demande.
+
+==================================================
+OBJECTIF
+==================================================
+
+Transforme la demande en véritable projet exploitable.
+
+Tu peux générer notamment :
+
+- site web
+- application web
+- bot Discord
+- script Python
+- projet JavaScript
+- projet TypeScript
+- application React
+- application mobile
+- projet Godot
+- projet Unity
+- API
+- outil CLI
+- projet Node.js
+- projet personnalisé
+
+==================================================
+REGLES
+==================================================
+
+1. Comprends d'abord exactement la demande.
+
+2. Choisis les technologies adaptées.
+
+3. Génère une structure de projet cohérente.
+
+4. Génère TOUS les fichiers nécessaires.
+
+5. Le code doit être complet et directement exploitable.
+
+6. Ne mets jamais de pseudo-code du genre :
+   "ajoutez votre code ici".
+
+7. Ne crée pas de fichiers inutiles.
+
+8. Les imports doivent correspondre aux fichiers réellement générés.
+
+9. Les chemins entre fichiers doivent être cohérents.
+
+10. Si un package est nécessaire, ajoute-le dans
+    package.json ou le fichier de dépendances approprié.
+
+11. Si une configuration est nécessaire, génère-la.
+
+12. Si des variables secrètes sont nécessaires,
+    utilise des variables d'environnement et génère
+    un fichier .env.example plutôt que de mettre
+    de véritables secrets.
+
+13. Pour une application complexe, organise le projet
+    avec des dossiers propres.
+
+14. Le projet doit être pensé pour pouvoir être
+    modifié ensuite par OneScript AI.
+
+==================================================
+FORMAT DE SORTIE OBLIGATOIRE
+==================================================
+
+La première ligne doit être :
+
+PROJECT_NAME: Nom du projet
+
+Ensuite retourne chaque fichier exactement sous cette forme :
+
+FILE: chemin/du/fichier.ext
+contenu complet du fichier
+END_FILE
+
+Exemple :
+
+PROJECT_NAME: Mon Bot Discord
+
+FILE: package.json
+{
+  "name": "mon-bot"
+}
+END_FILE
+
+FILE: index.js
+console.log("Bot");
+END_FILE
+
+IMPORTANT :
+
+- Un seul fichier par bloc FILE.
+- Le chemin doit être relatif au projet.
+- Aucun chemin commençant par /.
+- Aucun chemin contenant ..
+- N'ajoute pas de texte entre les blocs FILE.
+- Ne mets pas les fichiers dans des blocs Markdown.
+- Retourne le code COMPLET.
+`;
+
+  const response = await callAI(
+    env,
+    [
+      {
+        role: "system",
+        content:
+          "Tu es OneScript AI, un générateur professionnel de projets logiciels."
+      },
+      {
+        role: "user",
+        content: projectPrompt
+      }
+    ],
+    {
+      max_tokens: 14000,
+      temperature: 0.7
+    }
+  );
+
+  const files = parseProject(response);
+
+  if (Object.keys(files).length === 0) {
+    throw new Error(
+      "OneScript AI n'a généré aucun fichier valide."
+    );
+  }
+
+  return {
+    projectName:
+      extractProjectName(response),
+    type,
+    files
   };
 }
 
@@ -2067,6 +2259,46 @@ export default {
           workersAI: Boolean(env.AI),
           model: AI_MODEL,
           version: "V8-CLEAN"
+        });
+      }
+
+      if (
+        request.method === "POST" &&
+        url.pathname === "/api/project"
+      ) {
+        const body =
+          await request.json();
+
+        const prompt =
+          String(
+            body.prompt || ""
+          ).trim();
+
+        const type =
+          String(
+            body.type || "auto"
+          ).trim();
+
+        if (!prompt) {
+          return json(
+            {
+              ok: false,
+              error: "Prompt vide."
+            },
+            400
+          );
+        }
+
+        const project =
+          await generateProject(
+            env,
+            prompt,
+            type
+          );
+
+        return json({
+          ok: true,
+          project
         });
       }
 
